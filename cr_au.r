@@ -696,11 +696,11 @@ processedData <- list(
   aidedAwareness=q8r.bar.chart.list #slide 12 chart 1
   )
 for(x in 1:length(purchaseFrequencySubCategory)){
-  processedData [[paste('purchaseFrequency',x)]] <- purchaseFrequencySubCategory[x]
+  processedData [paste('purchaseFrequency',x)]<- purchaseFrequencySubCategory[x]
 }
 
 for(x in 1:length(consumptionFrequencySubCategory)){
-  processedData[[paste('consumptionFrequency',x)]] <- consumptionFrequencySubCategory[x]
+  processedData[paste('consumptionFrequency',x)] <- consumptionFrequencySubCategory[x]
 }
 
 
