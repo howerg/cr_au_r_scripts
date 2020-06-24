@@ -264,7 +264,7 @@ q3r.meta.data <- list(
   baseSize = max(q3r.n.valid),
   average = 'mean',
   chartType = 'bar',
-  orientation = 'v',
+  orientation = 'h',
   dataType = '1d',
   keyOrder = keyOrder,
   colors = c(replicate(3, "Green"), "Grey", replicate(4, "Green"))
