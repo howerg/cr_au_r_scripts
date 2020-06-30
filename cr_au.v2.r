@@ -11,6 +11,49 @@ if (debug == FALSE ) {
    dataMap  <-'./cr/301/example.dataMap.json'# path to your local rawData and dataMap file you want to test eg.: /Users/gretchenhower/Documents/R Projects/datafile/example.dataMap.json
 }
 
+########## JSON FORMATTING HELPER #########
+  returnChartDataAndMetaData <- function (
+                                 data,
+                                 title,
+                                 baseSize, 
+                                 questionID,
+                                 keyOrder="",
+                                 xAxisTitle="", 
+                                 yAxisTitle="",
+                                 chartType="pie",
+                                 colors=c("#1f78b4", "#a6cee3"),
+                                 orientation="v",
+                                 confidenceInterval="false", 
+                                 dataValue="percent", 
+                                 average='mean',
+                                 dataType="1d"){
+    metadata <- list(
+      'confidenceInterval'=confidenceInterval,
+      'dataValue'=dataValue,
+      'baseSize'=baseSize,
+      'average'=average,
+      'chartType'=chartType,
+      'orientation'=orientation,
+      'dataType'=dataType,
+      'colors'=colors,
+      'keyOrder'=keyOrder
+    )
+    returnObject <- list(
+      'title'=title,
+      'xAxisTitle'=xAxisTitle,
+      'yAxisTitle'=yAxisTitle,
+      'questionID'=questionID,
+      'metadata'=metadata,
+      'data'=data
+    )
+    result <- returnObject
+  }
+
+
+
+
+
+
 # load survey results into an R data.frame:
 example.raw.data <- fromJSON(dataFile)
 
@@ -177,18 +220,12 @@ Single.Column <- function(curr.id, n.level, report.level) {
   # count the number of responses for each variable
   pct.level <- 
     unlist(lapply(1:n.level, function(x) sum(valid.data == x)))/ n.valid
-  
-  # hard-coded labels:
-  names(pct.level) <-
-    c(
-      "Male",
-      "Female"
-    )
-  
-  
+    
   result <- list(
-    "sample size" = n.valid,
-    output.pct.level = pct.level[report.level]
+    'questionID' = curr.id,
+    'baseSize' = n.valid,
+    'data' = data.frame('attribute'=c('Male','Female'),'value'=pct.level[report.level])
+
   )
 }
 
@@ -211,20 +248,18 @@ Single.Column <- function(curr.id, n.level, report.level) {
   # count the number of responses for each variable
   pct.level <- 
     unlist(lapply(1:n.level, function(x) sum(valid.data == x)))/ n.valid
-  
-  # hard-coded labels:
-  names(pct.level) <-
-    c(
+  keyOrder <-c(
       "Northeast",
       "South",
       "Midwest",
       "West"
     )
-  
-  
   result <- list(
     "sample size" = n.valid,
-    output.pct.level = pct.level[report.level]
+    'questionID' = curr.id,
+    'baseSize' = n.valid,
+    'keyOrder'= keyOrder,
+    'data' = data.frame('attribute'=keyOrder,'value'=pct.level[report.level])
   )
 }
 
@@ -256,7 +291,7 @@ Single.Column <- function(curr.id, n.level, report.level) {
   #pct.level[n.level+2] <- sum(pct.level[(n.level-1):n.level])
   
   # hard-coded labels:
-  names(pct.level) <-
+  keyOrder <-
     c(
       "<$25k",
       "$25-$49k",
@@ -265,8 +300,11 @@ Single.Column <- function(curr.id, n.level, report.level) {
     )
   
   result <- list(
-    "sample size" = n.valid,
-    output.pct.level = pct.level[report.level]
+    'questionID' = curr.id,
+    'baseSize' = n.valid,
+    'keyOrder'= keyOrder,
+    'data' = data.frame('attribute'=keyOrder,'value'=pct.level[report.level])
+  
   )
 }
 
@@ -1535,14 +1573,58 @@ Q15 <- function (curr.id, question.order, aided.order) {
 # need to sig test
 # need to pass in sample sizes
 # need shortened labels, maybe
-#
 
+
+
+
+####FORMATING EXAMPLES###
+
+
+## we need to reformat
+#                                 data,
+#                                 title,
+#                                 baseSize, 
+#                                 questionID,
+#                                 keyOrder="",
+#                                 xAxisTitle="", 
+#                                 yAxisTitle="",
+#                                 chartType="pie",
+#                                 colors=c("#1f78b4", "#a6cee3"),
+#                                 orientation="v",
+#                                 confidenceInterval="false", 
+#                                 dataValue="percent", 
+#                                 average='mean',
+#                                 dataType="1d"
+genderFormatted <- returnChartDataAndMetaData(
+  out.slide4.r1c1.S3.gender.PC[['data']],
+  'Gender',
+  out.slide4.r1c1.S3.gender.PC[['baseSize']],
+  out.slide4.r1c1.S3.gender.PC[['questionID']],
+  c('Male','Female'),
+  '',
+  '',
+  'pie',
+  c('#00b1ac','#99ca3c')
+)
+
+regionFormatted <- returnChartDataAndMetaData(
+  out.slide4.r1c2.region_quota.MAP[['data']],
+  'Region',
+  out.slide4.r1c2.region_quota.MAP[['baseSize']],
+  out.slide4.r1c2.region_quota.MAP[['questionID']],
+  out.slide4.r1c2.region_quota.MAP[['keyOrder']],
+  '',
+  '',
+  'bar',
+  c('#00b1ac','#0398d3','#99ca3c','#36d2b4'),
+  'h'
+)
 
 
 ### NOTE we need one output object
 processedData <- list(
-    gender=out.slide4.r1c1.S3.gender.PC, #
-    region=out.slide4.r1c2.region_quota.MAP, #
+    gender=genderFormatted, #
+    region=regionFormatted, #
     D3=out.slide4.r1c3.D3.income.VSB, #
     ethnicity=out.slide4.r1c4.S5S6.ethnicity.VSB,#
     houseHoldSize=out.slide4.r2c1.D1.HHSize.UK, #
