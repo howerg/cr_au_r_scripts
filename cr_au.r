@@ -612,7 +612,7 @@ Convert.To.Data.Frame <-
 
 # BEGIN GENDER PIE CHART  First chart on slide 4
 
-Single.Column <- function(curr.id, n.level, report.level) {
+S3.Single.Column <- function(curr.id, n.level, report.level) {
   curr.data <- Data.Value(curr.id)
   
   ix.valid <- which(!is.na(curr.data))
@@ -3376,8 +3376,8 @@ regionFormatted <- returnChartDataAndMetaData(
 # including naming conventions, we can do that.
 
 processedData <- list(
-  "slide4.r1c1.S3.gender.PC" = out.slide4.r1c1.S3.gender.PC,
-  "slide4.r1c2.region_quota.MAP " = out.slide4.r1c2.region_quota.MAP ,
+  "gender" = genderFormatted,
+  "region" = regionFormatted ,
   "slide4.r1c3.D3.income.VSB" = out.slide4.r1c3.D3.income.VSB,
   "slide4.r1c4.S5S6.ethnicity.VSB" = out.slide4.r1c4.S5S6.ethnicity.VSB,
   "slide4.r2c1.D1.HHSize.UK " = out.slide4.r2c1.D1.HHSize.UK ,
