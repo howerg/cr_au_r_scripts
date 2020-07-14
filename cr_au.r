@@ -17,10 +17,10 @@ if (CR.trial) {
   setwd(data.path)
   
   # load survey results into an R data.frame:
-  example.raw.data <- fromJSON("example.rawData.200603.json")
+  example.raw.data <- fromJSON("example.rawData.json")
   
   # load data map into an R data.frame
-  example.data.map <- fromJSON("example.dataMap.200603.json")
+  example.data.map <- fromJSON("example.dataMap.json")
   
   setwd(curr.path)
 } else {
@@ -54,6 +54,48 @@ example.data.map.questions <- example.data.map$questions
 result1 <- example.raw.data 
 # load the json data map into R
 result2 <- example.data.map
+
+
+
+########## JSON FORMATTING HELPER START #########
+  returnChartDataAndMetaData <- function (
+                                 data,
+                                 title,
+                                 baseSize, 
+                                 questionID,
+                                 keyOrder="",
+                                 xAxisTitle="", 
+                                 yAxisTitle="",
+                                 chartType="pie",
+                                 colors=c("#1f78b4", "#a6cee3"),
+                                 orientation="v",
+                                 confidenceInterval="false", 
+                                 dataValue="percent", 
+                                 average='mean',
+                                 dataType="1d"){
+    metadata <- list(
+      'confidenceInterval'=confidenceInterval,
+      'dataValue'=dataValue,
+      'baseSize'=baseSize,
+      'average'=average,
+      'chartType'=chartType,
+      'orientation'=orientation,
+      'dataType'=dataType,
+      'colors'=colors,
+      'keyOrder'=keyOrder
+    )
+    returnObject <- list(
+      'title'=title,
+      'xAxisTitle'=xAxisTitle,
+      'yAxisTitle'=yAxisTitle,
+      'questionID'=questionID,
+      'metadata'=metadata,
+      'data'=data
+    )
+    result <- returnObject
+  }
+
+########## JSON FORMATTING HELPER END #########
 
 
 # names(example.data.map.variables)
@@ -570,26 +612,23 @@ Convert.To.Data.Frame <-
 
 # BEGIN GENDER PIE CHART  First chart on slide 4
 
-S3.Single.Column <- function(curr.id, n.level, report.level) {
+Single.Column <- function(curr.id, n.level, report.level) {
   curr.data <- Data.Value(curr.id)
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid, ]
+  valid.data <- curr.data[ix.valid,]
   
   # count the number of responses for each variable
-  pct.level <-
-    unlist(lapply(1:n.level, function(x)
-      sum(valid.data == x))) / n.valid
-  
-  # hard-coded labels:
-  names(pct.level) <-
-    c("Male",
-      "Female")
-  
-  
-  result <- list("sample size" = n.valid,
-                 output.pct.level = pct.level[report.level])
+  pct.level <- 
+    unlist(lapply(1:n.level, function(x) sum(valid.data == x)))/ n.valid
+    
+  result <- list(
+    'questionID' = curr.id,
+    'baseSize' = n.valid,
+    'data' = data.frame('attribute'=c('Male','Female'),'value'=pct.level[report.level])
+
+  )
 }
 
 
@@ -3290,6 +3329,37 @@ out.slide24.r2c4.Q35.reasons.HB <-
 
 out.slide25.Q34.reasonchoosebrand.HB <-
   Q34.new(curr.id = "Q34")
+
+
+###JSON FORMATTING EXAMPLE START ###
+genderFormatted <- returnChartDataAndMetaData(
+  out.slide4.r1c1.S3.gender.PC[['data']],
+  'Gender',
+  out.slide4.r1c1.S3.gender.PC[['baseSize']],
+  out.slide4.r1c1.S3.gender.PC[['questionID']],
+  c('Male','Female'),
+  '',
+  '',
+  'pie',
+  c('#00b1ac','#99ca3c')
+)
+
+regionFormatted <- returnChartDataAndMetaData(
+  out.slide4.r1c2.region_quota.MAP[['data']],
+  'Region',
+  out.slide4.r1c2.region_quota.MAP[['baseSize']],
+  out.slide4.r1c2.region_quota.MAP[['questionID']],
+  out.slide4.r1c2.region_quota.MAP[['keyOrder']],
+  '',
+  '',
+  'bar',
+  c('#00b1ac','#0398d3','#99ca3c','#36d2b4'),
+  'h'
+)
+###JSON FORMATTING EXAMPLE END ###
+
+
+
 
 
 ### Note: As a end output we would expect one list containing all charts eg.:
