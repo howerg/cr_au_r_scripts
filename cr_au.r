@@ -63,6 +63,11 @@ result2 <- example.data.map
 # names(example.data.map.questions)
 # [1] "qtitle"    "variables" "values"    "qlabel"    "type"      "grouping"
 
+
+# NOTE: CAHNGE needed this needs to be dynamic as we can have a variable number of sub categories?
+# I believe currently the maximum is set to 5 so the below covers all cases but I am not sure if it will
+# be easier to just calculate these on project by project basis? These might be only 3 or 5 etc. 
+
 Sub_Cat.variables <-
   c("Sub_Catr1",
     "Sub_Catr2",
@@ -75,6 +80,11 @@ Sub_Cat.n <- length(Sub_Cat.variables)
 # get the sub_cat indexes
 
 
+# NOTE: CAHNGE needed this needs to be dynamic as we can have a variable number of Brands on a project basis up to 8?
+# Currently maximum 8 brands are possible to be added on the storefront at the moment
+# Please change to fetch this dynamically from the dataMap
+### This number of rows will be the same as the qKeyBrands question plus the additional 3 red herrings + none of the above option
+### if this is purely needed for indexes qKeyBrands could be used as well
 Brands_Eval.variables <-
   c(
     "Brands_Evalr1",
@@ -88,7 +98,9 @@ Brands_Eval.variables <-
 Brands_Eval.values <- example.raw.data[Brands_Eval.variables]
 
 # KeyBrands:  Which Brands were identified as keyBrands
-
+# NOTE: CAHNGE needed this needs to be dynamic as we can have a variable number of Brands on a project basis up to 8?
+# Currently maximum 8 brands are possible to be added on the storefront at the moment
+# Please change to fetch this dynamically from the dataMap
 KeyBrands.variables <-
   c(
     "qKeyBrandsr1",
@@ -105,6 +117,11 @@ KeyBrands.values.1 <- as.numeric(KeyBrands.values[1, ])
 KeyBrands.index <- which(KeyBrands.values.1 == 1)
 KeyBrands.n <- length(KeyBrands.index)
 
+# NOTE: CAHNGE needed this needs to be dynamic as we can have a variable number of Brands on a project basis up to 8?
+# Currently maximum 8 brands are possible to be added on the storefront at the moment
+# Please change to fetch this dynamically from the dataMap
+### This number of rows (Brand_Usage) will be the same as the qKeyBrands question plus the additional 3 red herrings + none of the above option
+### if this is purely needed for indexes qKeyBrands could be used as well
 
 Brand_Usager.variables <-
   c(
@@ -3344,10 +3361,14 @@ processedData <- list(
 # }
 
 
-processedDataJSON <-
-  toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
+
 
 
 if (debug) {
-  lapply(processedDataJSON, write, "./RscriptTests/crau.json")
+  processedDataJSON <-
+  toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
+  lapply(processedDataJSON, write, "./RscriptTests/crau200603.json")
+} else { ## NOTE we need this in this format as for our reporting framework the last R script output needs to be that processedDataJSON
+  processedDataJSON <-
+  toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
 }
