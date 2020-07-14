@@ -640,23 +640,24 @@ region.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid, ]
+  valid.data <- curr.data[ix.valid,]
   
   # count the number of responses for each variable
-  pct.level <-
-    unlist(lapply(1:n.level, function(x)
-      sum(valid.data == x))) / n.valid
-  
-  # hard-coded labels:
-  names(pct.level) <-
-    c("Northeast",
+  pct.level <- 
+    unlist(lapply(1:n.level, function(x) sum(valid.data == x)))/ n.valid
+  keyOrder <-c(
+      "Northeast",
       "South",
       "Midwest",
-      "West")
-  
-  
-  result <- list("sample size" = n.valid,
-                 output.pct.level = pct.level[report.level])
+      "West"
+    )
+  result <- list(
+    "sample size" = n.valid,
+    'questionID' = curr.id,
+    'baseSize' = n.valid,
+    'keyOrder'= keyOrder,
+    'data' = data.frame('attribute'=keyOrder,'value'=pct.level[report.level])
+  )
 }
 
 
