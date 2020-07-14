@@ -17,10 +17,10 @@ if (CR.trial) {
   setwd(data.path)
   
   # load survey results into an R data.frame:
-  example.raw.data <- fromJSON("example.rawData.json")
+  example.raw.data <- fromJSON("example.rawData.200603.json")
   
   # load data map into an R data.frame
-  example.data.map <- fromJSON("example.dataMap.json")
+  example.data.map <- fromJSON("example.dataMap.200603.json")
   
   setwd(curr.path)
 } else {
@@ -48,6 +48,13 @@ example.raw.data.variables <-
 
 example.data.map.variables <- example.data.map$variables
 example.data.map.questions <- example.data.map$questions
+
+##This seems to be missing as I am getting errors result1 not found
+# load survey results into R dataframe:
+result1 <- example.raw.data 
+# load the json data map into R
+result2 <- example.data.map
+
 
 # names(example.data.map.variables)
 # [1] "vgroup"   "qtitle"   "colTitle" "title"    "rowTitle" "label"    "row"
@@ -3118,7 +3125,7 @@ out.slide11.Q8Q9.brandfunnel.HB <-
 out.slide1516.Q15.brandperf.UK <-
   Q15(
     curr.id = "Q15",
-    question.order = out.slide9.q6.importance.VSB$top.2.order,
+    question.order = out.slide9.Q6.importance.VSB$top.2.order,
     aided.order = 1:KeyBrands.n
   )
 
