@@ -31,9 +31,9 @@ if (CR.trial) {
     # dataFile <-'./cr/301/example.rawData.json'# path to your local rawData and dataMap file you want to test eg.: /Users/gretchenhower/Documents/R Projects/datafile/example.rawData.json
     # dataMap  <-'./cr/301/example.dataMap.json'# path to your local rawData and dataMap file you want to test eg.: /Users/gretchenhower/Documents/R Projects/datafile/example.dataMap.json
     dataFile <-
-      './cr/301/example.rawData.json'# path to your local rawData and dataMap file you want to test eg.: /Users/gretchenhower/Documents/R Projects/datafile/example.rawData.json
+      './cr/301/example.rawData.200603.json'# path to your local rawData and dataMap file you want to test eg.: /Users/gretchenhower/Documents/R Projects/datafile/example.rawData.json
     dataMap  <-
-      './cr/301/example.dataMap.json'# path to your local rawData and dataMap file you want to test eg.: /Users/gretchenhower/Documents/R Projects/datafile/example.dataMap.json
+      './cr/301/example.dataMap.200603.json'# path to your local rawData and dataMap file you want to test eg.: /Users/gretchenhower/Documents/R Projects/datafile/example.dataMap.json
   }
   
   # load survey results into an R dataframe:
@@ -98,6 +98,18 @@ result2 <- example.data.map
 ########## JSON FORMATTING HELPER END #########
 
 
+##### DATAFRAME HELPERS START #######
+### DataFrame Helpers start ###
+createDataFrameOfTwoLists <- function(list1, list2) {
+  df <- data.frame()[1:1, ]
+  for(i in 1:length(list1)){
+    df[[list1[i]]] <- list2[i]
+  }
+  rownames(df) <- NULL
+  result <- df
+}
+
+
 # names(example.data.map.variables)
 # [1] "vgroup"   "qtitle"   "colTitle" "title"    "rowTitle" "label"    "row"
 # [8] "type"     "col"      "qlabel"   "values"
@@ -116,6 +128,11 @@ Sub_Cat.variables <-
     "Sub_Catr3",
     "Sub_Catr4",
     "Sub_Catr5")
+
+### NOTE we need this to by dynamic so we read this from the dataMap
+result1.names <- names(example.raw.data)
+Sub_Cat.variable.index <- grep("Sub_Catr[0-9]+", result1.names) 
+Sub_Cat.variables <- result1.names[Sub_Cat.variable.index]
 
 Sub_Cat.values <- example.raw.data[Sub_Cat.variables]
 Sub_Cat.n <- length(Sub_Cat.variables)
@@ -153,6 +170,10 @@ KeyBrands.variables <-
     "qKeyBrandsr5",
     "qKeyBrandsr6"
   )
+
+### Note we need this to be dynamic
+KeyBrands.variable.index <- grep("qKeyBrandsr[0-9]+", result1.names)
+KeyBrands.variables <- result1.names[KeyBrands.variable.index]
 
 KeyBrands.values <- example.raw.data[KeyBrands.variables]
 
@@ -665,31 +686,51 @@ D3.Single.Column <- function(curr.id, n.level, report.level) {
   curr.data <- Data.Value(curr.id)
   
   # Specific to income, recode 'prefer not to answer' as missing
-  curr.data[curr.data == 7] <- NA
+  curr.data[curr.data==7] <- NA
   
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid, ]
+  valid.data <- curr.data[ix.valid,]
   
   # count the number of responses for each variable
-  pct.level <-
-    unlist(lapply(1:n.level, function(x)
-      sum(valid.data == x))) / n.valid
+  pct.level <- 
+    unlist(lapply(1:n.level, function(x) sum(valid.data == x)))/ n.valid
   
-  pct.level[n.level + 1] <- sum(pct.level[3:4])
-  pct.level[n.level + 2] <- sum(pct.level[5:6])
+  pct.level[n.level+1] <- sum(pct.level[3:4])
+  pct.level[n.level+2] <- sum(pct.level[5:6])
   #pct.level[n.level+2] <- sum(pct.level[(n.level-1):n.level])
   
   # hard-coded labels:
-  names(pct.level) <-
-    c("<$25k",
+  jsonDataKeyOrder <-
+    c("attribute",
+      "<$25k",
       "$25-$49k",
       "$50-$99k",
-      "$100k+")
+      "$100k+"
+    )
+
   
-  result <- list("sample size" = n.valid,
-                 output.pct.level = pct.level[report.level])
+  valuesOrder <- c("Income", pct.level[report.level] )
+  
+  data <- createDataFrameOfTwoLists(jsonDataKeyOrder,valuesOrder)
+
+  
+
+    keyOrder <-
+    c(
+      "<$25k",
+      "$25-$49k",
+      "$50-$99k",
+      "$100k+"
+    )
+  result <- list(
+    'questionID' = curr.id,
+    'baseSize' = n.valid,
+    'keyOrder'= keyOrder,
+    'data' = data
+  
+  )
 }
 
 
@@ -3357,6 +3398,19 @@ regionFormatted <- returnChartDataAndMetaData(
   c('#00b1ac','#0398d3','#99ca3c','#36d2b4'),
   'h'
 )
+
+inComeFormatted <- returnChartDataAndMetaData(
+  out.slide4.r1c3.D3.income.VSB[['data']],
+  'Income',
+  out.slide4.r1c3.D3.income.VSB[['baseSize']],
+  out.slide4.r1c3.D3.income.VSB[['questionID']],
+  out.slide4.r1c3.D3.income.VSB[['keyOrder']],
+  '',
+  '',
+  'stackedBar',
+  c("#42b2ac","#bddbe8", "#98ca3c", "#56d2b4"),
+  'v'
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -3378,7 +3432,7 @@ regionFormatted <- returnChartDataAndMetaData(
 processedData <- list(
   "gender" = genderFormatted,
   "region" = regionFormatted ,
-  "slide4.r1c3.D3.income.VSB" = out.slide4.r1c3.D3.income.VSB,
+  "income" = inComeFormatted,
   "slide4.r1c4.S5S6.ethnicity.VSB" = out.slide4.r1c4.S5S6.ethnicity.VSB,
   "slide4.r2c1.D1.HHSize.UK " = out.slide4.r2c1.D1.HHSize.UK ,
   "slide4.r2c1.D1.HHSize.UK" = out.slide4.r2c1.D1.HHSize.UK,
