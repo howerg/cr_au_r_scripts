@@ -96,6 +96,7 @@ Brands_Eval.variables <-
   )
 
 Brands_Eval.values <- example.raw.data[Brands_Eval.variables]
+### This Brands_Eval.values and Brands_Eval.variables seems not be used anywhere can this be removed?
 
 # KeyBrands:  Which Brands were identified as keyBrands
 # NOTE: CAHNGE needed this needs to be dynamic as we can have a variable number of Brands on a project basis up to 8?
@@ -134,6 +135,7 @@ Brand_Usager.variables <-
   )
 
 Brand_Usager.values <- example.raw.data[Brand_Usager.variables]
+### This Brand_Usager.values and Brand_Usager.variables seems not be used anywhere can this be removed?
 
 # data.map <- example.data.map
 
