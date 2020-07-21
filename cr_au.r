@@ -1,6 +1,8 @@
 require(jsonlite)
 require(ca)	# load correspondence analysis package
 
+setwd('/home/phil/projects/purespectrum/Notes/tickets/FORGE-912/cr_au_r_scripts')
+
 CR.trial <- FALSE
 debug <- TRUE  # FALSE to read command line inputs
 
@@ -86,6 +88,10 @@ returnChartDataAndMetaData <- function (object,
     'data' = object[['data']]
   )
   
+  if(!is.null(object[['subTitle']])){
+    returnObject['subTitle'] <- object[['subTitle']]
+  }
+
   if (!is.null(supplement)) {
     returnObject <- c(returnObject, list("supplement" = supplement))
   }
@@ -1267,13 +1273,17 @@ Q37 <- function(curr.id, n.level) {
 
   rownames(curr.pct.response) <- rowNames #level.string
   colnames(curr.pct.response) <- colNames #data.map.variable$rowTitle
-  
+  #row.names(curr.pct.response) <- c('attribute')
+ # curr.pct.response.row.names <- 'attribute'
+  transposedData <- as.data.frame(t(as.matrix(curr.pct.response)))
   result <- list(
-    "n.valid" = curr.count$n.valid,
-    "pct.response" = curr.pct.response,
+    "baseSize" = curr.count$n.valid,
+    "data" = transposedData,
     "title" = "Sustainability Attitudes",
-    "curr.id" = curr.id,
-    "chart.type" = "stacked bar"
+    "subTitle"= "Please tell us how you would classify each statement",
+    "questionID" = curr.id,
+    "chartType" = "bar",
+    "keyOrder" = rowNames
   )
 }
 
@@ -3831,6 +3841,13 @@ urbanicityFormatted <- returnChartDataAndMetaData(
   'v'
 )
 
+sustainabilityFormatted <- returnChartDataAndMetaData(
+  out.slide5.Q37.sustainability.VSB,
+  'Sustainability Attitudes',
+  '','',
+  'stackedBar',
+  'v'
+)
 
 ###JSON FORMATTING EXAMPLE END ###
 
@@ -3957,7 +3974,7 @@ processedData <- list(
   "householdComposition" = householdCompositionFormatted,
   "generation" = generationFormatted,
   "Urbanicity" = urbanicityFormatted,
-  "sustainability" = out.slide5.Q37.sustainability.VSB
+  "sustainability" = sustainabilityFormatted
 
 #  "sustainability" = formatted.slide5.Q37.sustainability,
 #  "catPurchRec" = formatted.slide6.c1.Q1.catpurchrec,
