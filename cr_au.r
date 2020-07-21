@@ -198,6 +198,12 @@ brand.usage <-
   Field.From.Map(example.raw.data, example.data.map, "Brand_Usage")
 
 
+main.cat <-
+  Field.From.Map(example.raw.data, example.data.map, "Main_Cat")
+
+
+cat.name <- main.cat[['variables']][['rowTitle']]
+
 example.raw.data.names <- names(example.raw.data)
 # Sub_Cat.variable.index <- grep("Sub_Catr[0-9]+", example.raw.data.names)
 
@@ -1338,11 +1344,8 @@ Q1.Single.Column <- function(curr.id, n.level, report.level) {
   pct.level[n.level + 1] <- sum(pct.level[1:3])
   pct.level[n.level + 2] <- sum(pct.level[(n.level - 1):n.level])
   
-  pct.report <- as.data.frame(pct.level[report.level])
-  
-  # hard-coded labels:
-  rownames(pct.report) <-
-    c(
+
+  rowNames <-c(
       "Weekly",
       "Every 2 - 3 weeks",
       "Monthly",
@@ -1352,13 +1355,26 @@ Q1.Single.Column <- function(curr.id, n.level, report.level) {
       "Every 7 - 12 Months",
       " < 1 x Year"
     )
-  
+
+  data <- data.frame(
+      'attribute' = rowNames,
+      'value' = pct.level[report.level]
+    )
   result <- list(
-    "n.valid" = n.valid,
-    "pct.response" = pct.report,
-    "title" = "Category Purchase Recency",
-    "curr.id" = curr.id,
-    "orientation" = "h"
+    "baseSize" = n.valid,
+    "data" = data,
+    "title" = "Purchase Recency",
+    "subTitle"= paste("How recently have you purchased ",cat.name,"?", sep = ""),
+    "questionID" = curr.id,
+    "chartType" = "stackedBar",
+    "keyOrder" = rowNames,
+    'orientation' = 'h',
+    'colors' = c("#d4e6c0",
+          "#c0db9c",
+          "#a8d16b",
+          "#92c039",
+          "#92b64e",
+          "#71952c")
   )
 }
 
@@ -3650,155 +3666,6 @@ out.slide25.Q34.reasonchoosebrand.HB <-
   Q34.new(curr.id = "Q34")
 
 
-Pre.Format <- function(slide,
-                       data.field = "pct.response",
-                       title.field = "title",
-                       base.size.field = "n.valid",
-                       question.id.field = "curr.id",
-                       key.order.field = NULL,
-                       x.axis.title = NULL,
-                       y.axis.title = NULL,
-                       chart.type.field = "default",
-                       colors = NULL,
-                       orientation.field = NULL,
-                       confidence.interval = NULL,
-                       data.value = NULL,
-                       average = NULL,
-                       data.type = NULL)
-{
-  # chart.type.field = NULL will set chart.type to "bar"
-  #
-  
-  Append.Named.Element <-
-    function(argument.list,
-             element.name,
-             element.value) {
-      if (is.list(element.value)) {
-        named.element <- list(element.value)
-      } else {
-        named.element <- as.list(element.value)
-      }
-      
-      names(named.element) <- element.name
-      result <- c(argument.list, named.element)
-    }
-  
-  
-  Append.Argument.Value <-
-    function(argument.list,
-             argument.name,
-             argument.value) {
-      if (!is.null(argument.value)) {
-        argument.list <-
-          Append.Named.Element(argument.list, argument.name, argument.value)
-      }
-      
-      result <- argument.list
-    }
-  
-  
-  Append.Argument.Field <- function(argument.list,
-                                    argument.name,
-                                    argument.field,
-                                    default.field = NULL) {
-    if (is.null(argument.field)) {
-      if (default.field %in% slide.names) {
-        argument.list <-
-          Append.Argument.Value(argument.list, argument.name, slide[[default.field]])
-      }
-      
-      # if the default field is not found, do not add an element to the argument list
-      
-    } else {
-      argument.list <-
-        Append.Argument.Value(argument.list, argument.name, slide[[argument.field]])
-    }
-    
-    result <- argument.list
-  }
-  
-  
-  slide.names <- names(slide)
-  
-  slide.data <- slide[[data.field]]
-  
-  if (!(question.id.field %in% slide.names)) {
-    question.id.field <- "question.id"
-  }
-  
-  check.n.valid <- sum(!is.na(slide[[base.size.field]]))
-  if (check.n.valid == 0){
-    paste('No non-missing arguments to max')
-    
-  }
-  
-  argument.list <- list(
-    "data" = slide[[data.field]],
-    "title" = slide[[title.field]],
-    "baseSize" = max(slide[[base.size.field]]),
-    "questionID" = slide[[question.id.field]]
-  )
-  
-  if (is.null(key.order.field)) {
-    if (nrow(slide.data) == 1) {
-      key.order <- colnames(slide.data)
-    } else {
-      key.order <- rownames(slide.data)
-    }
-    
-    argument.list <- c(argument.list,
-                       list("keyOrder" = key.order))
-  }
-  
-  argument.list <-
-    Append.Argument.Value(argument.list, "xAxisTitle", x.axis.title)
-  argument.list <-
-    Append.Argument.Value(argument.list, "yAxisTitle", y.axis.title)
-  
-  if (!is.null(chart.type.field)) {
-    if (chart.type.field == "default") {
-      if ("chart.type" %in% slide.names) {
-        argument.list <-
-          Append.Argument.Field(argument.list, "chartType", "chart.type")
-      } else {
-        argument.list <-
-          Append.Argument.Value(argument.list, "chartType", "bar")
-      }
-    } else {
-      argument.list <-
-        Append.Argument.Field(argument.list, "chartType", chart.type.field)
-    }
-  }
-  
-  argument.list <-
-    Append.Argument.Value(argument.list, "colors", colors)
-  argument.list <-
-    Append.Argument.Field(argument.list,
-                          "orientation",
-                          orientation.field,
-                          "orientation")
-  argument.list <-
-    Append.Argument.Value(argument.list, "confidenceInterval", confidence.interval)
-  argument.list <-
-    Append.Argument.Value(argument.list, "dataValue", data.value)
-  argument.list <-
-    Append.Argument.Value(argument.list, "average", average)
-  argument.list <-
-    Append.Argument.Value(argument.list, "dataType", data.type)
-  
-  if ("supplement" %in% slide.names) {
-    argument.list <-
-      Append.Argument.Field(argument.list, "supplement", "supplement")
-  }
-  
-  # might want to change dataValue and dataType to field; possibly others
-  # this would require adding named elements to slide (instead of passing in parameter values)
-  
-  return(do.call(returnChartDataAndMetaData, argument.list))
-  
-}
-
-
 ###JSON FORMATTING EXAMPLE START ###
 genderFormatted <- returnChartDataAndMetaData(
   out.slide4.r1c1.S3.gender.PC
@@ -3836,6 +3703,9 @@ sustainabilityFormatted <- returnChartDataAndMetaData(
   out.slide5.Q37.sustainability.VSB
 )
 
+purchaseRecencyFormatted <- returnChartDataAndMetaData(
+  out.slide6.c1.Q1.catpurchrec.HB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 # colors will need to be supplied to all of these:
@@ -3961,10 +3831,8 @@ processedData <- list(
   "householdComposition" = householdCompositionFormatted,
   "generation" = generationFormatted,
   "Urbanicity" = urbanicityFormatted,
-  "sustainability" = sustainabilityFormatted
-
-#  "sustainability" = formatted.slide5.Q37.sustainability,
-#  "catPurchRec" = formatted.slide6.c1.Q1.catpurchrec,
+  "sustainabilityAttitudes" = sustainabilityFormatted,
+  "purchaseRecency" = purchaseRecencyFormatted
 #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
 #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
 #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
