@@ -1433,7 +1433,7 @@ Q3 <- function(curr.id, n.level) {
   pct.report <- as.data.frame(output.pct.purchase.frequency)
   
   # hard-coded labels:
-  rownames(pct.report) <-
+  rowNames <-
     c(
       "Weekly",
       "Every 2 - 3 weeks",
@@ -1444,13 +1444,22 @@ Q3 <- function(curr.id, n.level) {
       "Every 7 - 12 Months",
       " < 1 x Year"
     )
-  
+  data <- data.frame('attribute'= rowNames, 'value'=output.pct.purchase.frequency)
   result <- list(
-    "n.valid" = category.frequency.n.valid,
-    "pct.response" = pct.report,
-    "title" = "Category Purchase Frequency",
-    "curr.id" = curr.variables,
-    "orientation" = "h"
+    "baseSize" = category.frequency.n.valid,
+    "data" = data,
+    "title" = "Purchase Frequency",
+    "subTitle"= paste("How often do you personally purchase ",cat.name,"?", sep = ""),
+    "questionID" = curr.variables,
+    "chartType" = "stackedBar",
+    "keyOrder" = rowNames,
+    'orientation' = 'h',
+    'colors' = c("#d4e6c0",
+          "#c0db9c",
+          "#a8d16b",
+          "#92c039",
+          "#92b64e",
+          "#71952c")
   )
 }
 
@@ -3706,6 +3715,10 @@ sustainabilityFormatted <- returnChartDataAndMetaData(
 purchaseRecencyFormatted <- returnChartDataAndMetaData(
   out.slide6.c1.Q1.catpurchrec.HB
 )
+
+purchaseFrequncyFormatted <- returnChartDataAndMetaData(
+  out.slide6.c2.Q3.catpurchfreq.HB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 # colors will need to be supplied to all of these:
@@ -3832,11 +3845,12 @@ processedData <- list(
   "generation" = generationFormatted,
   "Urbanicity" = urbanicityFormatted,
   "sustainabilityAttitudes" = sustainabilityFormatted,
-  "purchaseRecency" = purchaseRecencyFormatted
+  "purchaseRecency" = purchaseRecencyFormatted,
+  "purchaseFrequency" = purchaseFrequncyFormatted,
 #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
 #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
 #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
-#  "subcatPurchFreq" = formatted.slide7.Q3.subcatpurchfreq,
+   "subcatPurchFreq" = out.slide7.Q3.subcatpurchfreq.HB,
 #  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
 #  "where they shop" = formatted.slide8.Q5.wheretheyshop,
 #  "importance" = formatted.slide9.Q6.importance,
