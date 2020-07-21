@@ -57,7 +57,7 @@ example.data.map.questions <- example.data.map$questions
 
 ########## JSON FORMATTING HELPER START #########
 returnChartDataAndMetaData <- function (object,
-                                        title,
+                                        title = "",
                                         xAxisTitle = "",
                                         yAxisTitle = "",
                                         chartType = "pie",
@@ -73,14 +73,14 @@ returnChartDataAndMetaData <- function (object,
     'dataValue' = dataValue,
     'baseSize' = object[['baseSize']],
     'average' = average,
-    'chartType' = chartType,
-    'orientation' = orientation,
+    'chartType' = if(!is.null(object[['chartType']])) object[['chartType']] else chartType,
+    'orientation' = if(!is.null(object[['orientation']])) object[['orientation']] else orientation,
     'dataType' = dataType,
-    'colors' = colors,
+    'colors' = if(!is.null(object[['colors']])) object[['colors']] else colors,
     'keyOrder' = object[['keyOrder']]
   )
   returnObject <- list(
-    'title' = title,
+    'title' = if(!is.null(object[['title']])) object[['title']] else title,
     'xAxisTitle' = xAxisTitle,
     'yAxisTitle' = yAxisTitle,
     'questionID' = object[['questionID']],
@@ -691,8 +691,11 @@ S3.Single.Column <- function(curr.id, n.level, report.level) {
       'attribute' = c('Male', 'Female'),
       'value' = pct.level[report.level]
     ),
-    'keyOrder' = c('Male', 'Female')
-    
+    'keyOrder' = c('Male', 'Female'),
+    'title' = 'Gender',
+    'chartType' = 'pie',
+    'colors' = c("#42b2ac", "#98ca3c"),
+    'orientation' = 'v'
   )
 }
 
@@ -720,7 +723,11 @@ region.Single.Column <- function(curr.id, n.level, report.level) {
     'questionID' = curr.id,
     'baseSize' = n.valid,
     'keyOrder' = keyOrder,
-    'data' = data.frame('attribute' = keyOrder, 'value' = pct.level[report.level])
+    'data' = data.frame('attribute' = keyOrder, 'value' = pct.level[report.level]),
+    'chartType' = 'bar',
+    'orientation' = 'h',
+    'title' = 'Region',
+    'colors' =  c("#00b1ac", "#0398d3", "#99ca3c", "#36d2b4")
   )
 }
 
@@ -772,7 +779,11 @@ D3.Single.Column <- function(curr.id, n.level, report.level) {
     'questionID' = curr.id,
     'baseSize' = n.valid,
     'keyOrder' = keyOrder,
-    'data' = data
+    'data' = data,
+    'title' = 'Income',
+    'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4"),
+    'chartType' = "stackedBar",
+    'orientation' = 'v'
     
   )
 }
@@ -858,7 +869,11 @@ Ethnicity <- function() {
     "data" = data,
     "baseSize" = S5.n.valid,
     "questionID" = list("S5", "S6"),
-    "keyOrder" = jsonDataKeyOrder[-1]
+    "keyOrder" = jsonDataKeyOrder[-1],
+    'title' = 'Ethnicity',
+    'chartType' = 'stackedBar',
+    'orientation' = 'v',
+    'colors' = c("#83adba", "#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
   )
   
 }
@@ -912,7 +927,9 @@ HHSize.Single.Column.Infer.N.Level <-
       "questionID" = curr.id,
       "chartType" = "table",
       "keyOrder" = keyOrder,
-      "data" = pct.level[report.level]
+      "data" = pct.level[report.level],
+      'chartType' = 'table',
+      'orientation' = 'v'  
     )
   }
 
@@ -1107,6 +1124,7 @@ Household.Composition <- function() {
   result <- list(
     "title" = "Household Composition",
     "data" = data,
+    'chartType' = 'bar',
     "baseSize" = HHcompr5.n.valid,
     "questionID" = list(
       "HHcompr2",
@@ -1116,7 +1134,13 @@ Household.Composition <- function() {
       "HHcompr6",
       "HHcompr7"
     ),
-    "orientation" = "h"
+    "orientation" = "h",
+    'colors' = c( "#d4e6c0",
+                  "#c0db9c",
+                  "#a8d16b",
+                  "#92c039",
+                  "#92b64e",
+                  "#71952c")
   )
   
 }
@@ -1174,7 +1198,10 @@ Age.Single.Column.Infer.N.Level <- function(curr.id, report.level) {
     "title" = "Generations",
     "questionID" = curr.id,
     'keyOrder'= jsonKeyOrder[-1],
-    "data" = data
+    "data" = data,
+    'chartType'= 'stackedBar',
+    'orientation' = 'v',
+    'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
   )
 }
 
@@ -1211,7 +1238,11 @@ urban.Single.Column <- function(curr.id, n.level, report.level) {
     "questionID" = curr.id,
     "chartType" = "stackedBar",
     "orientation" = "v",
-    "keyOrder" = jsonKeyOrder[-1]
+    "keyOrder" = jsonKeyOrder[-1],
+    'chartType'= 'stackedBar',
+    'orientation' = 'v',
+    'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
+  
   )
 }
 
@@ -1282,8 +1313,10 @@ Q37 <- function(curr.id, n.level) {
     "title" = "Sustainability Attitudes",
     "subTitle"= "Please tell us how you would classify each statement",
     "questionID" = curr.id,
-    "chartType" = "bar",
-    "keyOrder" = rowNames
+    "chartType" = "stackedBar",
+    "keyOrder" = rowNames,
+    'orientation' = 'v',
+    'colors' = c("#83adba", "#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
   )
 }
 
@@ -3768,42 +3801,19 @@ Pre.Format <- function(slide,
 
 ###JSON FORMATTING EXAMPLE START ###
 genderFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c1.S3.gender.PC,
-  'Gender',
-  '',
-  '',
-  'pie',
-  c('#00b1ac', '#99ca3c')
+  out.slide4.r1c1.S3.gender.PC
 )
 
 regionFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c2.region_quota.MAP,
-  'Region',
-  '',
-  '',
-  'bar',
-  c('#00b1ac', '#0398d3', '#99ca3c', '#36d2b4'),
-  'h'
+  out.slide4.r1c2.region_quota.MAP
 )
 
 inComeFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c3.D3.income.VSB,
-  'Income',
-  '',
-  '',
-  'stackedBar',
-  c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4"),
-  'v'
+  out.slide4.r1c3.D3.income.VSB
 )
 
 ethnicityFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c4.S5S6.ethnicity.VSB,
-  'Ethnicity',
-  '',
-  '',
-  'stackedBar',
-  c("#83adba", "#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4"),
-  'v'
+  out.slide4.r1c4.S5S6.ethnicity.VSB
 )
 
 householdSizeFormatted <- addTableDataKey(
@@ -3812,41 +3822,18 @@ householdSizeFormatted <- addTableDataKey(
 )
 
 householdCompositionFormatted <- returnChartDataAndMetaData(
-  out.slide4.r2c2.HHCompr.HHComp.HB,
-  'Household Composition',
-  '','',
-  'bar',
-  c("#d4e6c0",
-    "#c0db9c",
-    "#a8d16b",
-    "#92c039",
-    "#92b64e",
-    "#71952c"),
-    'h')
+  out.slide4.r2c2.HHCompr.HHComp.HB)
 
 generationFormatted <- returnChartDataAndMetaData(
-  out.slide4.r2c3.S4.generations.VSB,
-  'Generations',
-  '','',
-  'stackedBar',
-  c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
+  out.slide4.r2c3.S4.generations.VSB
 )
 
 
 urbanicityFormatted <- returnChartDataAndMetaData(
-  out.slide4.r2c4.D4.urbanicity.VSB,
-  'Urbanicity',
-  '','',
-  'stackedBar',
-  'v'
-)
+  out.slide4.r2c4.D4.urbanicity.VSB)
 
 sustainabilityFormatted <- returnChartDataAndMetaData(
-  out.slide5.Q37.sustainability.VSB,
-  'Sustainability Attitudes',
-  '','',
-  'stackedBar',
-  'v'
+  out.slide5.Q37.sustainability.VSB
 )
 
 ###JSON FORMATTING EXAMPLE END ###
@@ -4034,7 +4021,7 @@ processedData <- list(
 if (debug) {
   processedDataJSON <-
     toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
-  lapply(processedDataJSON, write, "./RscriptTests/crauProcessedData.json")
+  lapply(processedDataJSON, write, "./RscriptTests/crauProcessedData1.json")
 } else {
   ## NOTE we need this in this format as for our reporting framework the last R script output needs to be that processedDataJSON
   processedDataJSON <-
