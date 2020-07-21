@@ -1619,8 +1619,7 @@ Slide7.Q3 <- function(curr.id, n.level) {
       colSums(curr.pct.response[7:8, ])
     )
   
-  rownames(out.pct.response) <-
-    c(
+  rowNames <- c(
       "Weekly",
       "Every 2 - 3 Weeks",
       "Monthly",
@@ -1630,6 +1629,9 @@ Slide7.Q3 <- function(curr.id, n.level) {
       "Every 7 - 12 Months",
       " < 1 x Year"
     )
+
+  rownames(out.pct.response) <- rowNames
+    
   
   data.map.index <-
     match(row.variable, example.data.map.variables$label)
@@ -1638,11 +1640,18 @@ Slide7.Q3 <- function(curr.id, n.level) {
   colnames(out.pct.response) <- data.map.variable$rowTitle
   
   result <- list(
-    "n.valid" = curr.count$n.valid,
-    "pct.response" = out.pct.response,
-    "curr.id" = curr.id,
+    "baseSize" = curr.count$n.valid,
+    "data" = out.pct.response,
+    "questionID" = curr.id,
     "title" = "Subcategory Purchase Frequency",
-    "orientation" = "h"
+    "orientation" = "h",
+    'colors' = c("#d4e6c0",
+          "#c0db9c",
+          "#a8d16b",
+          "#92c039",
+          "#92b64e",
+          "#71952c"),
+    'keyOrder' = rowNames
   )
 }
 
@@ -3835,6 +3844,30 @@ purchaseFrequncyFormatted <- returnChartDataAndMetaData(
 # contents of the "chart lists".  If you can provide us with a desired format,
 # including naming conventions, we can do that.
 
+## We need one chart per sub category as previously stated
+
+returnDataFrameFromRow <- function (dataObj, idx) {
+  currentData <- dataObj[['data']][idx]
+  colnames(currentData) <- 'value'
+  print(currentData)
+  returnList <- list(
+    'baseSize' = dataObj[['baseSize']][idx],
+    'questionID' = dataObj[['questionID']],
+    'title' = names(dataObj[['data']][idx]),
+    'orientation' = dataObj[['orientation']],
+    'colors' = dataObj[['colors']],
+    'keyOrder' = dataObj['keyOrder'],
+    'data' = currentData
+  )
+  print(returnList)
+  result <-returnList
+}
+
+
+
+
+
+
 processedData <- list(
   "gender" = genderFormatted,
   "region" = regionFormatted ,
@@ -3846,11 +3879,10 @@ processedData <- list(
   "Urbanicity" = urbanicityFormatted,
   "sustainabilityAttitudes" = sustainabilityFormatted,
   "purchaseRecency" = purchaseRecencyFormatted,
-  "purchaseFrequency" = purchaseFrequncyFormatted,
+  "purchaseFrequency" = purchaseFrequncyFormatted
 #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
 #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
 #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
-   "subcatPurchFreq" = out.slide7.Q3.subcatpurchfreq.HB,
 #  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
 #  "where they shop" = formatted.slide8.Q5.wheretheyshop,
 #  "importance" = formatted.slide9.Q6.importance,
@@ -3897,7 +3929,11 @@ processedData <- list(
 # }
 
 
-
+transposedData1 <- out.slide7.Q3.subcatpurchfreq.HB #as.data.frame(t(as.matrix(out.slide7.Q3.subcatpurchfreq.HB[['pct.response']])))
+for(x in 1:length(transposedData1[['data']])){
+  print(names(transposedData1[['data']][x]))
+  processedData[[paste('subcategory', x, sep='')]] <- returnDataFrameFromRow(transposedData1,x)
+}
 
 
 if (debug) {
