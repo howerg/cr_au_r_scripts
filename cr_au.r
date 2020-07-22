@@ -1873,7 +1873,9 @@ Q6 <- function(curr.id, n.level, report.level) {
 # vertical bar chart (sorted means)
 
 Q8 <- function(curr.id, max.valid.row) {
-  curr.pattern <- paste(curr.id, "r.+", sep = "")
+  #we always want to use only names without the image references
+  #therefore using this qId qKeyBrands instead of curr.id
+  curr.pattern <- paste('qKeyBrands', "r.+", sep = "")  # using qKeyBrands hardcoded instead of curr.id
   
   # find the variables that begin with the pattern
   curr.variable.index <-
@@ -1904,8 +1906,6 @@ Q8 <- function(curr.id, max.valid.row) {
   data.map.variable <- example.data.map.variables[data.map.index,]
   brand.name <- data.map.variable$rowTitle[1:n.attribute]
   
-  #   brand.name <- t(as.data.frame(data.map.variable$rowTitle[1:n.attribute]))
-  
   colnames(curr.n.response) <- t(brand.name)
   colnames(curr.pct.response) <- t(brand.name)
   aided.order <- order(curr.pct.response, decreasing = TRUE)
@@ -1915,16 +1915,30 @@ Q8 <- function(curr.id, max.valid.row) {
   key.brands.aided.order <-
     order(key.brands.pct.response, decreasing = TRUE)
   
+  rowNames <- brand.name
   result <- list(
-    "n.valid" = curr.count$n.valid[aided.order],
-    "n.response" = curr.n.response[, aided.order],
+    #"n.valid" = curr.count$n.valid[aided.order],
+    #"n.response" = curr.n.response[, aided.order],
     "pct.response" = curr.pct.response[, aided.order],
     "aided.order" = aided.order,
-    "key.brands.aided.order" = key.brands.aided.order,
-    "title" = "Aided Awareness",
-    "curr.id" = curr.id
+    #"key.brands.aided.order" = key.brands.aided.order,
+    #"curr.id" = curr.id,
+
+    "chartType" = "bar",
+    "title" = "% Aided Brand Awareness",
+    "baseSize" = curr.count$n.valid[aided.order][[1]],
+    "data" = curr.pct.response[, aided.order],
+    "questionID" = curr.id,
+    "orientation" = 'v',
+    'colors' = c("#71952c",
+          "#92b64e",
+          "#92c039",
+          "#92c039",
+          "#92b64e",
+          "#71952c"),
+    'keyOrder' = rowNames)
     
-  )
+  
 }
 
 
@@ -3541,19 +3555,6 @@ out.slide11.Q8Q9.brandfunnel.HB <-
     out.slide10.c2.Q8.aidaware.VB$pct.response
   )
 
-# aided awareness results already sorted
-# sort order based on aided awareness
-
-#out.slide10.c2.Q8.aidaware.VB$aided.order
-#out.slide10.c2.Q8.aidaware.VB$pct.response
-
-# q9.brandfunnel.results.sorted <-
-#   q9.brandfunnel.results[order(q9r.brandfunnel.results[1, ], decreasing = TRUE]
-
-# q6.result$top.2.order contains the question importance order indexes
-
-# q8.result$key.brands.aided.order contains the aided brand awareness order
-# indexes for the key brands
 
 out.slide1516.Q15.brandperf.UK <-
   Q15(
@@ -3762,6 +3763,10 @@ whereTheyShopFormatted <- returnChartDataAndMetaData(
 whatsImportantFormatted <- returnChartDataAndMetaData(
   out.slide9.Q6.importance.VSB
 )
+
+aidedAwarenessFormatted <- returnChartDataAndMetaData(
+  out.slide10.c2.Q8.aidaware.VB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 # colors will need to be supplied to all of these:
@@ -3924,9 +3929,10 @@ processedData <- list(
 
 
 "whereTheyShop" = whereTheyShopFormatted, #slide 8 # out.slide8.Q5.wheretheyshop.VSB
-"whatsImportant" = whatsImportantFormatted #slide 9
-#  "awarenes" = formatted.slide10.c2.Q8.aidaware,
-#  "brandFunnel" = formatted.slide11.Q8Q9.brandfunnel,
+"whatsImportant" = whatsImportantFormatted, #slide 9
+### "unaidedBrandAwareness" = MISSING  ###
+"aidedBrandAwareness" = aidedAwarenessFormatted,
+"brandFunnel" = out.slide11.Q8Q9.brandfunnel.HB
 #  "brand.purchase.recency" = formatted.slide12.c1.slide13.c1.Q10.brandpurchrec,
 #  "recency.of.brand" = formatted.slide13.c2.Q11.recencyofbrand,
 #  "satisfaction.brand.avail" = formatted.slide12.c2.slide13.c1.Q14.satisbrandavail,
@@ -3979,7 +3985,7 @@ for(x in 1:length(subcategoriesAppend[['data']])){
 if (debug) {
   processedDataJSON <-
     toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
-  lapply(processedDataJSON, write, "./RscriptTests/crauProcessedData1.json")
+  lapply(processedDataJSON, write, "./RscriptTests/crauProcessedData2.json")
 } else {
   ## NOTE we need this in this format as for our reporting framework the last R script output needs to be that processedDataJSON
   processedDataJSON <-
