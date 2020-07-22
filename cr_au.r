@@ -1827,8 +1827,8 @@ Q6 <- function(curr.id, n.level, report.level) {
   report.pct.response.top.2 <-
     report.pct.response.select[1,] +
     report.pct.response.select[2,]
-  row.names(report.pct.response.top.2) <-
-    paste(n.level - 1, "+", n.level, sep = "")
+  row.names(report.pct.response.top.2) <- 'Somewhat/Extremely'
+    #paste(n.level - 1, "+", n.level, sep = "")
   
   top.2.order <- order(report.pct.response.top.2, decreasing = TRUE)
   
@@ -1839,15 +1839,29 @@ Q6 <- function(curr.id, n.level, report.level) {
   
   colnames(report.pct.response) <- curr.row.title
   
+
+  transposedData <- as.data.frame(t(as.matrix(report.pct.response[, top.2.order])))
+  rowNames <- names(transposedData)
+
   result <- list(
-    "n.valid" = curr.count$n.valid[top.2.order],
-    "n.response" = curr.count$n.response[, top.2.order],
-    "pct.response" = report.pct.response[, top.2.order],
+    #"n.valid" = curr.count$n.valid[top.2.order],
+    #"n.response" = curr.count$n.response[, top.2.order],
+    #"pct.response" = report.pct.response[, top.2.order],
     "top.2.order" = top.2.order,
-    "curr.id" =  curr.variables,
-    "chart.type" = "stacked bar",
-    "title" = "What's Important"
-  )
+    #"curr.id" =  curr.variables,
+    "chartType" = "stackedBar",
+    "title" = "What's Important",
+    "baseSize" = curr.count$n.valid[top.2.order],
+    "data" = transposedData,
+    "questionID" = curr.variables,
+    "orientation" = 'v',
+    'colors' = c("#71952c",
+          "#92b64e",
+          "#92c039",
+          "#92c039",
+          "#92b64e",
+          "#71952c"),
+    'keyOrder' = rowNames)
 }
 
 
@@ -2287,12 +2301,24 @@ Q5 <- function(curr.id, n.top, n.level) {
   report.n.valid <- sort.n.valid
   report.n.valid[n.top + 1] <- other.n.valid
   report.pct.response <- report.n.response / report.n.valid
+
   
+
+  transposedData <- as.data.frame(t(as.matrix(report.pct.response)))
+  rowNames <- names(transposedData)
   result <- list(
-    "n.valid" = report.n.valid,
-    "pct.response" = report.pct.response,
     "title" = "Where They Shop",
-    "question.id" = curr.id
+    "baseSize" = report.n.valid,
+    "data" = transposedData,
+    "questionID" = curr.id,
+    "orientation" = "v",
+    'colors' = c("#71952c",
+          "#92b64e",
+          "#92c039",
+          "#92c039",
+          "#92b64e",
+          "#71952c"),
+    'keyOrder' = rowNames
   )
 }
 
@@ -3728,6 +3754,14 @@ purchaseRecencyFormatted <- returnChartDataAndMetaData(
 purchaseFrequncyFormatted <- returnChartDataAndMetaData(
   out.slide6.c2.Q3.catpurchfreq.HB
 )
+
+whereTheyShopFormatted <- returnChartDataAndMetaData(
+  out.slide8.Q5.wheretheyshop.VSB
+)
+
+whatsImportantFormatted <- returnChartDataAndMetaData(
+  out.slide9.Q6.importance.VSB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 # colors will need to be supplied to all of these:
@@ -3867,23 +3901,30 @@ returnDataFrameFromRow <- function (dataObj, idx) {
 
 
 processedData <- list(
-  "gender" = genderFormatted,
-  "region" = regionFormatted ,
-  "income" = inComeFormatted,
-  "ethnicity" = ethnicityFormatted, #formatted.slide4.r1c4.S5S6.ethnicity,
-  "householdSize" = householdSizeFormatted,
-  "householdComposition" = householdCompositionFormatted,
-  "generation" = generationFormatted,
-  "Urbanicity" = urbanicityFormatted,
-  "sustainabilityAttitudes" = sustainabilityFormatted,
-  "purchaseRecency" = purchaseRecencyFormatted,
-  "purchaseFrequency" = purchaseFrequncyFormatted
+  "gender" = genderFormatted, #slide 4
+  "region" = regionFormatted , #slide 4
+  "income" = inComeFormatted, #slide 4
+  "ethnicity" = ethnicityFormatted, #slide 4 
+  "householdSize" = householdSizeFormatted, #slide 4
+  "householdComposition" = householdCompositionFormatted, #slide 4
+  "generation" = generationFormatted, #slide 4
+  "Urbanicity" = urbanicityFormatted, #slide 4
+  "sustainabilityAttitudes" = sustainabilityFormatted, #slide 5
+  "purchaseRecency" = purchaseRecencyFormatted, #slide 6
+  "purchaseFrequency" = purchaseFrequncyFormatted, #slide 6 
+  #### slide 7 charts are appended at the end to processedData via a loop ###
+
+  ### don't know what these are for START ?
 #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
 #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
 #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
 #  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
-#  "where they shop" = formatted.slide8.Q5.wheretheyshop,
-#  "importance" = formatted.slide9.Q6.importance,
+  ### don't know what these are for END ?
+
+
+
+"whereTheyShop" = whereTheyShopFormatted, #slide 8 # out.slide8.Q5.wheretheyshop.VSB
+"whatsImportant" = whatsImportantFormatted #slide 9
 #  "awarenes" = formatted.slide10.c2.Q8.aidaware,
 #  "brandFunnel" = formatted.slide11.Q8Q9.brandfunnel,
 #  "brand.purchase.recency" = formatted.slide12.c1.slide13.c1.Q10.brandpurchrec,
@@ -3927,10 +3968,12 @@ processedData <- list(
 # }
 
 
+### slide 7 START
 subcategoriesAppend <- out.slide7.Q3.subcatpurchfreq.HB #as.data.frame(t(as.matrix(out.slide7.Q3.subcatpurchfreq.HB[['pct.response']])))
 for(x in 1:length(subcategoriesAppend[['data']])){
   processedData[[paste('subcategory', x, sep='')]] <- returnDataFrameFromRow(subcategoriesAppend,x)
 }
+### slide 7 END
 
 
 if (debug) {
