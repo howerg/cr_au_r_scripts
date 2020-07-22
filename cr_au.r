@@ -3849,7 +3849,6 @@ purchaseFrequncyFormatted <- returnChartDataAndMetaData(
 returnDataFrameFromRow <- function (dataObj, idx) {
   currentData <- dataObj[['data']][idx]
   colnames(currentData) <- 'value'
-  print(currentData)
   returnList <- list(
     'baseSize' = dataObj[['baseSize']][idx],
     'questionID' = dataObj[['questionID']],
@@ -3859,7 +3858,6 @@ returnDataFrameFromRow <- function (dataObj, idx) {
     'keyOrder' = dataObj['keyOrder'],
     'data' = currentData
   )
-  print(returnList)
   result <-returnList
 }
 
@@ -3929,10 +3927,9 @@ processedData <- list(
 # }
 
 
-transposedData1 <- out.slide7.Q3.subcatpurchfreq.HB #as.data.frame(t(as.matrix(out.slide7.Q3.subcatpurchfreq.HB[['pct.response']])))
-for(x in 1:length(transposedData1[['data']])){
-  print(names(transposedData1[['data']][x]))
-  processedData[[paste('subcategory', x, sep='')]] <- returnDataFrameFromRow(transposedData1,x)
+subcategoriesAppend <- out.slide7.Q3.subcatpurchfreq.HB #as.data.frame(t(as.matrix(out.slide7.Q3.subcatpurchfreq.HB[['pct.response']])))
+for(x in 1:length(subcategoriesAppend[['data']])){
+  processedData[[paste('subcategory', x, sep='')]] <- returnDataFrameFromRow(subcategoriesAppend,x)
 }
 
 
