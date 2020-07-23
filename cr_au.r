@@ -55,6 +55,19 @@ example.data.map.questions <- example.data.map$questions
 
 
 
+getSingleSelectRowLabels <- function (id) {
+  q <- subset(example.data.map.variables, qlabel == id) #example.data.map.variables$qlabel[['Q14']]
+  qTextLabels <- q$values[[1]][['title']]
+  result <- qTextLabels
+}
+
+getSingleSelectRowValues <- function (id) {
+  q <- subset(example.data.map.variables, qlabel == id) #example.data.map.variables$qlabel[['Q14']]
+  qTextLabels <- q$values[[1]][['value']]
+  result <- qTextLabels
+}
+
+
 ########## JSON FORMATTING HELPER START #########
 returnChartDataAndMetaData <- function (object,
                                         title = "",
@@ -445,7 +458,17 @@ Rollup.From.ID <-
       # << note that sample size varies across brands
       "pct.response" = rollup.pct,
       "orientation" = "h",
-      "title" = rollup.title
+      "title" = rollup.title,
+      "baseSize" = data.count$n.valid,
+      "data" = rollup.pct,
+      "questionID" = id,
+      'chartType' = 'stackedBar',
+      'colors' = c("#d4e6c0",
+            "#c0db9c",
+            "#a8d16b",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
     )
   }
 
@@ -572,17 +595,26 @@ Single.Column.Data <- function(id) {
 
 Single.Stacked.Bar <-
   function(id, sort.order = 'decreasing', title) {
+    curr.pattern <- paste(id, "r.+", sep = "")
+
+
+    result1.names <- names(example.raw.data)
+    varIdx <- grep(curr.pattern, result1.names) 
+    varLabels <- result1.names[varIdx]
+
     id.data <- Single.Column.Data(id)
     column.name <- colnames(id.data$data)
     level.count <- Data.Level.Count(id.data$data, id.data$n.level)
-    colnames(level.count$n.response) <- column.name
-    colnames(level.count$pct.response) <- column.name
+    colnames(level.count$n.response) <- varLabels
+    colnames(level.count$pct.response) <- varLabels
     
     result <- list(
       "n.valid" = level.count$n.valid,
       "pct.response" = as.data.frame(level.count$pct.response),
       "curr.id" = id,
-      "title" = title
+      "title" = title,
+      "subTitle" = paste('How satisfied are you with the', cat.name , 'brands currently available?'),
+      'keyOrder' = column.name
     )
   }
 
@@ -1645,6 +1677,7 @@ Slide7.Q3 <- function(curr.id, n.level) {
     "questionID" = curr.id,
     "title" = "Subcategory Purchase Frequency",
     "orientation" = "h",
+    'chartType' = 'bar',
     'colors' = c("#d4e6c0",
           "#c0db9c",
           "#a8d16b",
@@ -2066,14 +2099,25 @@ Brand.Funnel <- function(aided.sort.order, aided.sorted.results) {
   
   colnames(Q9.result.sorted) <- colnames(aided.sorted.results)
   
-  
+  rowNames <- c('Aided Aware','Consider','Ever Tried', 'Lapsed', 'Current User', 'Loyalist', 'Trial Conversion', 'Retained Triers' )
   
   result <- list(
     "pct.response" = Q9.result.sorted,
     "title" = "Brand Funnel",
     "curr.id" = q9r.variables,
     "n.valid" = n.valid,
-    "orientation" = "h"
+    "orientation" = "h",
+    'data' = Q9.result.sorted,
+    'baseSize' = n.valid,
+    'chartType' = 'bar',
+    'questionID' = q9r.variables,
+    'colors' = c("#d4e6c0",
+          "#c0db9c",
+          "#a8d16b",
+          "#92c039",
+          "#92b64e",
+          "#71952c"),
+    'keyOrder' = rowNames
   )
   
   #result<-rbind(aided.results,Q9.result.sorted)
@@ -3767,6 +3811,18 @@ whatsImportantFormatted <- returnChartDataAndMetaData(
 aidedAwarenessFormatted <- returnChartDataAndMetaData(
   out.slide10.c2.Q8.aidaware.VB
 )
+
+
+## need to transpose the data and add the keyOrder
+transformedDataAndKeyOrderAdded <- out.slide12.c1.slide13.c1.Q10.brandpurchrec.hsb
+transformedDataAndKeyOrderAdded[['data']] <- as.data.frame(t(as.matrix(transformedDataAndKeyOrderAdded[['data']] )))
+transformedDataAndKeyOrderAdded[['keyOrder']]  <- colnames(transformedDataAndKeyOrderAdded[['data']] ) 
+
+
+recencyOfBrandsFormatted <- returnChartDataAndMetaData(
+  transformedDataAndKeyOrderAdded
+)
+
 ###JSON FORMATTING EXAMPLE END ###
 
 # colors will need to be supplied to all of these:
@@ -3893,11 +3949,12 @@ returnDataFrameFromRow <- function (dataObj, idx) {
     'questionID' = dataObj[['questionID']],
     'title' = names(dataObj[['data']][idx]),
     'orientation' = dataObj[['orientation']],
+    'chartType' = dataObj[['chartType']],
     'colors' = dataObj[['colors']],
-    'keyOrder' = dataObj['keyOrder'],
+    'keyOrder' = dataObj[['keyOrder']],
     'data' = currentData
   )
-  result <-returnList
+  result <-returnChartDataAndMetaData(returnList)
 }
 
 
@@ -3925,15 +3982,18 @@ processedData <- list(
 #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
 #  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
   ### don't know what these are for END ?
-
-
-
-"whereTheyShop" = whereTheyShopFormatted, #slide 8 # out.slide8.Q5.wheretheyshop.VSB
-"whatsImportant" = whatsImportantFormatted, #slide 9
+  "whereTheyShop" = whereTheyShopFormatted, #slide 8 # out.slide8.Q5.wheretheyshop.VSB
+  "whatsImportant" = whatsImportantFormatted, #slide 9
 ### "unaidedBrandAwareness" = MISSING  ###
-"aidedBrandAwareness" = aidedAwarenessFormatted,
-"brandFunnel" = out.slide11.Q8Q9.brandfunnel.HB
-#  "brand.purchase.recency" = formatted.slide12.c1.slide13.c1.Q10.brandpurchrec,
+  "aidedBrandAwareness" = aidedAwarenessFormatted, #Slide 10 unaided is missing
+
+### SLIDE 11 ###
+# "brandFunnel" = out.slide11.Q8Q9.brandfunnel.HB
+### brand funnel charts are split and will be appended at the end of the processedData 
+### via a loop brand1-xxx
+
+  "recencyOfBrand" = recencyOfBrandsFormatted, #slide 12
+  "satisfactionBrandAvailable" = out.slide12.c2.slide13.c1.Q14.satisbrandavail.vsb #slide 12 
 #  "recency.of.brand" = formatted.slide13.c2.Q11.recencyofbrand,
 #  "satisfaction.brand.avail" = formatted.slide12.c2.slide13.c1.Q14.satisbrandavail,
 #  "brand.affinity" = formatted.slide14.c1.q12.brandaffinity,
@@ -3981,11 +4041,19 @@ for(x in 1:length(subcategoriesAppend[['data']])){
 }
 ### slide 7 END
 
+### slide 11 START
+brandsFunnel <- out.slide11.Q8Q9.brandfunnel.HB
+for(x in 1:length(brandsFunnel[['data']])){
+  processedData[[paste('brand', x, sep='')]] <- returnDataFrameFromRow(brandsFunnel,x)
+}
+
+### slide 11 END
+
 
 if (debug) {
   processedDataJSON <-
     toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
-  lapply(processedDataJSON, write, "./RscriptTests/crauProcessedData2.json")
+  lapply(processedDataJSON, write, "./RscriptTests/crauProcessedData3.json")
 } else {
   ## NOTE we need this in this format as for our reporting framework the last R script output needs to be that processedDataJSON
   processedDataJSON <-
