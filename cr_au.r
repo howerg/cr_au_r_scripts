@@ -543,13 +543,23 @@ Rollup.From.ID.Sorted <-
       "n.level" = rollup.raw$n.level,
       "level.label" = rollup.raw$level.label,
       "n.rollup.level" = rollup.raw$n.rollup.level,
-      "n.respondent" = rollup.raw$n.respondent[order.index],
+      "n.respondent" = rollup.raw$n.respondent[ ,order.index],
       "curr.id" = id,
       "n.valid" = rollup.raw$n.valid,
       "pct.response" = rollup.raw$pct.response[, order.index],
       "sort.index" = order.index,
       "orientation" = "h",
-      "title" = rollup.title
+      "title" = rollup.title,
+      'data' = rollup.raw$pct.response[, order.index],
+      'baseSize' = rollup.raw$n.valid,
+      "questionID" = id,
+      'chartType' = 'stackedBar',
+      'colors' = c("#d4e6c0",
+            "#c0db9c",
+            "#a8d16b",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
     )
   }
 
@@ -573,7 +583,17 @@ Rollup.From.ID.Set.Order <- function (id,
     "n.valid" = rollup.raw$n.valid,
     "pct.response" = rollup.raw$pct.response[, column.index],
     "orientation" = "h",
-    title = rollup.raw$title
+    title = rollup.raw$title,
+    'data' = rollup.raw$pct.response[, column.index],
+    'baseSize' = rollup.raw$n.valid,
+    "questionID" = id,
+    'chartType' = 'stackedBar',
+    'colors' = c("#d4e6c0",
+          "#c0db9c",
+          "#a8d16b",
+          "#92c039",
+          "#92b64e",
+          "#71952c")
   )
 }
 
@@ -3842,6 +3862,32 @@ recencyBrandUsageFormatted <- returnChartDataAndMetaData(
   transformedDataAndKeyOrderAddedQ11
 )
 
+
+
+
+## need to transpose the data and add the keyOrder
+transformBrandAffinity <- out.slide14.c1.q12.brandaffinity.HSB
+transformBrandAffinity[['data']] <- as.data.frame(t(as.matrix(transformBrandAffinity[['data']] )))
+transformBrandAffinity[['keyOrder']]  <- colnames(transformBrandAffinity[['data']] ) 
+
+
+brandAffinityFormatted <- returnChartDataAndMetaData(
+  transformBrandAffinity
+)
+
+
+likelihoodToRecommendBrand <- out.slide14.c2.q13.brandreclikelihood.HSB
+likelihoodToRecommendBrand[['data']] <- as.data.frame(t(as.matrix(likelihoodToRecommendBrand[['data']] )))
+## rename cols according to ppt example
+notToExtreme <- c('Not at all', 'Not very', 'Somewhat', 'Very', 'Extremely')
+colnames(likelihoodToRecommendBrand[['data']]) <- notToExtreme
+likelihoodToRecommendBrand[['keyOrder']]  <- colnames(likelihoodToRecommendBrand[['data']] ) 
+
+likelihoodToRecommendBrandFormatted <- returnChartDataAndMetaData(
+  likelihoodToRecommendBrand
+)
+
+
 ###JSON FORMATTING EXAMPLE END ###
 
 # colors will need to be supplied to all of these:
@@ -4015,8 +4061,8 @@ processedData <- list(
   "satisfactionBrandAvailable" = satisfactionBrandAvailableFormatted, #slide 12 && slide 13
   "recencBrandPurchase" = recencyOfBrandsFormatted, #slide 13
   "recencyBrandUsage" = recencyBrandUsageFormatted, #slide 13
-  "brandAffinity" = out.slide14.c1.q12.brandaffinity.HSB, #slide 14
-#  "likelihood.recommend.brand" = formatted.slide14.c2.q13.brandreclikelihood,
+  "brandAffinity" = brandAffinityFormatted, #out.slide14.c1.q12.brandaffinity.HSB #slide 14
+  "likelihoodToRecommendBrand" = likelihoodToRecommendBrandFormatted #formatted.slide14.c2.q13.brandreclikelihood, # slide 14
 #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
 #  "pmap" = formatted.slide19.q15.pmap,
 #  "lastBrandPurchased" = formatted.slide21.r1c1.Q16.lastbrandpurch,
