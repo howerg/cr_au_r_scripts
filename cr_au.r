@@ -595,26 +595,26 @@ Single.Column.Data <- function(id) {
 
 Single.Stacked.Bar <-
   function(id, sort.order = 'decreasing', title) {
-    curr.pattern <- paste(id, "r.+", sep = "")
 
-
-    result1.names <- names(example.raw.data)
-    varIdx <- grep(curr.pattern, result1.names) 
-    varLabels <- result1.names[varIdx]
-
+    rowNames <- getSingleSelectRowLabels(id)
     id.data <- Single.Column.Data(id)
-    column.name <- colnames(id.data$data)
+    row.name <- rownames(id.data$data)
     level.count <- Data.Level.Count(id.data$data, id.data$n.level)
-    colnames(level.count$n.response) <- varLabels
-    colnames(level.count$pct.response) <- varLabels
+    rownames(level.count$n.response) <- rowNames
+    rownames(level.count$pct.response) <- rowNames
+
+    transposedData <- as.data.frame(t(as.matrix(level.count$pct.response)))
     
     result <- list(
-      "n.valid" = level.count$n.valid,
-      "pct.response" = as.data.frame(level.count$pct.response),
-      "curr.id" = id,
+      "baseSize" = level.count$n.valid,
+      "data" = rev(transposedData),
+      "questionID" = id,
       "title" = title,
       "subTitle" = paste('How satisfied are you with the', cat.name , 'brands currently available?'),
-      'keyOrder' = column.name
+      'keyOrder' = rev(rowNames),
+      'chartType' = 'stackedBar',
+      'orientation' = 'v',
+      'colors' = c("#83adba", "#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
     )
   }
 
@@ -3823,6 +3823,25 @@ recencyOfBrandsFormatted <- returnChartDataAndMetaData(
   transformedDataAndKeyOrderAdded
 )
 
+
+### need to use the row labels as the key value plus add an empty attribute
+satisfactionBrandAvailableFormatted = returnChartDataAndMetaData(
+  out.slide12.c2.slide13.c1.Q14.satisbrandavail.vsb
+)
+
+
+
+
+## need to transpose the data and add the keyOrder
+transformedDataAndKeyOrderAddedQ11 <- out.slide13.c2.Q11.recencyofbrand.hsb
+transformedDataAndKeyOrderAddedQ11[['data']] <- as.data.frame(t(as.matrix(transformedDataAndKeyOrderAddedQ11[['data']] )))
+transformedDataAndKeyOrderAddedQ11[['keyOrder']]  <- colnames(transformedDataAndKeyOrderAddedQ11[['data']] ) 
+
+
+recencyBrandUsageFormatted <- returnChartDataAndMetaData(
+  transformedDataAndKeyOrderAddedQ11
+)
+
 ###JSON FORMATTING EXAMPLE END ###
 
 # colors will need to be supplied to all of these:
@@ -3993,10 +4012,10 @@ processedData <- list(
 ### via a loop brand1-xxx
 
   "recencyOfBrand" = recencyOfBrandsFormatted, #slide 12
-  "satisfactionBrandAvailable" = out.slide12.c2.slide13.c1.Q14.satisbrandavail.vsb #slide 12 
-#  "recency.of.brand" = formatted.slide13.c2.Q11.recencyofbrand,
-#  "satisfaction.brand.avail" = formatted.slide12.c2.slide13.c1.Q14.satisbrandavail,
-#  "brand.affinity" = formatted.slide14.c1.q12.brandaffinity,
+  "satisfactionBrandAvailable" = satisfactionBrandAvailableFormatted, #slide 12 && slide 13
+  "recencBrandPurchase" = recencyOfBrandsFormatted, #slide 13
+  "recencyBrandUsage" = recencyBrandUsageFormatted, #slide 13
+  "brandAffinity" = out.slide14.c1.q12.brandaffinity.HSB, #slide 14
 #  "likelihood.recommend.brand" = formatted.slide14.c2.q13.brandreclikelihood,
 #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
 #  "pmap" = formatted.slide19.q15.pmap,
