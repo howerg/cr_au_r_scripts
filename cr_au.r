@@ -118,7 +118,7 @@ convertTotableDataFormat <- function(data, keys){
     # only way I could work out how to map keys list to  a data list
     tempList <- list()
     tempList[keys[i]] = data[i]
-    percent100List[[i]] = tempList #list('wtf'= data[i])
+    percent100List[[i]] = tempList 
 
   }
   newData = list(
@@ -145,6 +145,8 @@ addTableDataKey <- function(object, title, isGrid = TRUE) {
 
   result <- chartFormat
 }
+
+
 
 
 ########## JSON FORMATTING HELPER END #########
@@ -2268,6 +2270,9 @@ Q15 <- function (curr.id, question.order, aided.order) {
   
   combined <- cbind(sorted.pct.response, significance.to.combine)
   
+
+  transposedData <- sorted.pct.response #as.data.frame(t(as.matrix(sorted.pct.response)))
+  rowNames <- rownames(transposedData)
   result <- list(
     "curr.id" = curr.id,
     "n.valid" = sorted.brand.sample.size,
@@ -2275,7 +2280,21 @@ Q15 <- function (curr.id, question.order, aided.order) {
     "just.pct.response" = sorted.pct.response,
     "pct.response" = combined,
     "brand.sample.size" = sorted.brand.sample.size,
-    "significance" = significance
+    "significance" = significance,
+
+
+    "orientation" = "h",
+    'data' = transposedData,
+    'baseSize' = sorted.brand.sample.size,
+    'chartType' = 'table',
+    'questionID' = curr.id,
+    'colors' = c("#d4e6c0",
+          "#c0db9c",
+          "#a8d16b",
+          "#92c039",
+          "#92b64e",
+          "#71952c"),
+    'keyOrder' = rowNames
   )
 }
 
@@ -2747,36 +2766,6 @@ last.purchase.data <- Last.Purchase.Reason.Data("Q22")
 ##################### END SLIDE 22-23 ####################################################
 
 
-#############  BEING SLIDE 21 7 CHARTS  ##############
-
-# BEGIN Q16 HORIZONTAL BAR CHART  First chart on slide 21
-
-# Q16.Single.Column <- function(curr.id, n.level, report.level) {
-#   curr.data <- Data.Value(curr.id)
-#
-#   ix.valid <- which(!is.na(curr.data))
-#   n.valid <- length(ix.valid)
-#   valid.data <- curr.data[ix.valid,]
-#
-#   # count the number of responses for each variable
-#   pct.level <-
-#     unlist(lapply(1:n.level, function(x)
-#       sum(valid.data == x))) / n.valid
-#
-#
-#
-#
-#   result <- list("pct.response" = as.data.frame(pct.level[report.level]),
-#                  "title" = "Last Brand Purchased",
-#                  "n.valid" = n.valid,
-#                  "curr.id" = curr.id,
-#                  "orientation"="h"
-#                 )
-#
-#         }
-
-# Sort and label
-# sig test
 
 ########################***************************##############################
 ########################*NEW Q16*#########################
@@ -3888,61 +3877,49 @@ likelihoodToRecommendBrandFormatted <- returnChartDataAndMetaData(
 )
 
 
+
+brandTopFeaturesFormatted <- returnChartDataAndMetaData(
+  out.slide1516.Q15.brandperf.UK
+)
+
+
+convertToGridTableFormat <- function(obj){
+  data <- obj[['data']]
+  baseSize <- obj[['baseSize']]
+  tableData <- list()
+  colNames <- colnames(data)
+  rowNames <- rownames(data)
+
+  for (e in 1:length(colNames)){
+    tableData[[e]] <- list(
+      'baseSize' = baseSize[e],
+      'qtitle'='',
+      'type'='single',
+      'rowTitle'= colNames[[e]],
+      'isGrid'= TRUE
+    )
+    tableData[[e]][['data']]<- list(
+      'percent100' = list()
+    )
+    percent100 <- list()
+    for (i in 1:length(rowNames)) {
+      rowName <-rowNames[i]
+      # only way I could work out how to map keys list to  a data list
+      tempList <- list()
+      tempList[rowName] = data[i,paste(colNames[e])]
+      percent100[[i]]= tempList #list
+    }
+    tableData[[e]][['data']][['percent100']] = percent100
+  }
+  result <- tableData
+}
+
+brandTopFeaturesFormatted[['tableData']] <- convertToGridTableFormat(out.slide1516.Q15.brandperf.UK)
+
+
 ###JSON FORMATTING EXAMPLE END ###
 
-# colors will need to be supplied to all of these:
 
-# out.slide4.r1c4.S5S6.ethnicity.VSB <-- need to return question ID, add labels to percentages
-# ... keyOrder (which appear to be the percentage labels)
-# ...what's the orientation?
-
-
-#formatted.slide4.r1c4.S5S6.ethnicity <-
-#  Pre.Format(out.slide4.r1c4.S5S6.ethnicity.VSB)
-#formatted.slide4.r2c2.HHComp.household.composition <-
-#  Pre.Format(out.slide4.r2c2.HHCompr.HHComp.HB)
-
-
-#formatted.slide4.r2c1.D1.HHSize <-
-#  Pre.Format(out.slide4.r2c1.D1.HHSize.UK)
-
-
-##  formatted.slide4.r2c3.S4.generations <-
-##    Pre.Format(out.slide4.r2c3.S4.generations.VSB)
-##  formatted.slide4.r2c4.D4.urbanicity <-
-##    Pre.Format(out.slide4.r2c4.D4.urbanicity.VSB)
-##  formatted.slide5.Q37.sustainability <-
-##    Pre.Format(out.slide5.Q37.sustainability.VSB)
-##  formatted.slide6.c1.Q1.catpurchrec <-
-##    Pre.Format(out.slide6.c1.Q1.catpurchrec.HB)
-##  formatted.slide6.c2.Q3.catpurchfreq <-
-##    Pre.Format(out.slide6.c2.Q3.catpurchfreq.HB)
-##  formatted.slide6A.c1.Q2.catconsrec <-
-##    Pre.Format(out.slide6A.c1.Q2.catconsrec.HB)
-##  formatted.slide6a.c2.Q4.catconsfreq <-
-##    Pre.Format(out.slide6a.c2.Q4.catconsfreq.HB)
-##  formatted.slide7.Q3.subcatpurchfreq <-
-##    Pre.Format(out.slide7.Q3.subcatpurchfreq.HB)
-##  formatted.slide7a.Q4.subcatconsfreq <-
-##    Pre.Format(out.slide7a.Q4.subcatconsfreq.HB)
-##  formatted.slide8.Q5.wheretheyshop <-
-##    Pre.Format(out.slide8.Q5.wheretheyshop.VSB)
-##  formatted.slide9.Q6.importance <-
-##    Pre.Format(out.slide9.Q6.importance.VSB)
-##  formatted.slide10.c2.Q8.aidaware <-
-##    Pre.Format(out.slide10.c2.Q8.aidaware.VB)
-##  formatted.slide11.Q8Q9.brandfunnel <-
-##    Pre.Format(out.slide11.Q8Q9.brandfunnel.HB)
-##  formatted.slide19.q15.pmap <- Pre.Format(out.slide19.q15.pmap.SP)
-##  
-##  formatted.slide12.c1.slide13.c1.Q10.brandpurchrec <-
-##    Pre.Format(out.slide12.c1.slide13.c1.Q10.brandpurchrec.hsb)
-##  formatted.slide13.c2.Q11.recencyofbrand <-
-##    Pre.Format(out.slide13.c2.Q11.recencyofbrand.hsb)
-##  formatted.slide12.c2.slide13.c1.Q14.satisbrandavail <-
-##    Pre.Format(out.slide12.c2.slide13.c1.Q14.satisbrandavail.vsb)
-##  formatted.slide14.c1.q12.brandaffinity <-
-##    Pre.Format(out.slide14.c1.q12.brandaffinity.HSB)
 ##  formatted.slide14.c2.q13.brandreclikelihood <-
 ##    Pre.Format(out.slide14.c2.q13.brandreclikelihood.HSB)
 ##  formatted.slide1516.Q15.brandperf <-
@@ -4062,8 +4039,8 @@ processedData <- list(
   "recencBrandPurchase" = recencyOfBrandsFormatted, #slide 13
   "recencyBrandUsage" = recencyBrandUsageFormatted, #slide 13
   "brandAffinity" = brandAffinityFormatted, #out.slide14.c1.q12.brandaffinity.HSB #slide 14
-  "likelihoodToRecommendBrand" = likelihoodToRecommendBrandFormatted #formatted.slide14.c2.q13.brandreclikelihood, # slide 14
-#  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
+  "likelihoodToRecommendBrand" = likelihoodToRecommendBrandFormatted, #formatted.slide14.c2.q13.brandreclikelihood, # slide 14
+  "categoryBrandTopFeatures"= brandTopFeaturesFormatted #out.slide1516.Q15.brandperf.UK         #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
 #  "pmap" = formatted.slide19.q15.pmap,
 #  "lastBrandPurchased" = formatted.slide21.r1c1.Q16.lastbrandpurch,
 #  "tripType" = formatted.slide21.r1c2.Q17.triptype,
