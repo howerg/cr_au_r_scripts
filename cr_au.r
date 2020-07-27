@@ -3171,22 +3171,41 @@ Q26.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-  names(pct.level) <-
-    c(
+
+  keyOrder <-  c(
       "Everyday",
       "Regular Occasion / Little Special",
       "Special Family Occasion",
       "Party / Entertaining",
       "Other"
     )
-  
+
+  # names(pct.level) <- keyOrder
+   
+  data <- as.data.frame(pct.level)
+  rownames(data) <- keyOrder
+  transposedData <- as.data.frame(t(as.matrix(data)))
+  rowNames <- names(transposedData)
+
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level[report.level]),
     "curr.id" = curr.id,
     "title" = "Occasion Type",
-    "chart.type" = "stacked bar"
+    "chart.type" = "stacked bar",
+    "chartType" = "stackedBar",
+      'data' = transposedData,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'chartType' = 'bar',
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -3237,19 +3256,33 @@ Intended.User <- function() {
     
     
     # hard-coded labels:
-    names(Q25r.pct.purchase.frequency.level) <-
-      c("Self",
+    keyOrder <- c("Self",
         "Spouse / SO",
         "Other Adult",
         "Kids 0 - 12",
         "Kids 13 - 17")
+    names(Q25r.pct.purchase.frequency.level) <- keyOrder
+      
   }
+
+  dataAsList <- unlist(Q25r.pct.purchase.frequency.level,use.names=FALSE)
   result <- list(
     "pct.response" = Q25r.pct.purchase.frequency.level,
     "title" = "Intended User",
     "n.valid" = Q25r.n.valid,
     "curr.id" = "Q25",
-    "orientation" = "h"
+    "orientation" = "h",
+      "chartType" = "bar",
+      'data' = data.frame('value'=dataAsList, 'attribute'=keyOrder),
+      'keyOrder' = keyOrder,
+      'baseSize' = Q25r.n.valid,
+      'questionID' = "Q25",
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
   
   
@@ -4018,6 +4051,15 @@ pricePaidFormatted <- returnChartDataAndMetaData(
 substitutabilityFormatted <- returnChartDataAndMetaData(
   out.slide21.r2c2.Q23.subst.PC
 )
+
+
+typeOfOccasionFormatted <- returnChartDataAndMetaData(
+  out.slide21.r2c3.Q26.occtype.VSB
+)
+
+intendedUserForamtted <- returnChartDataAndMetaData(
+  out.slide21.r2c4.Q25.user.HB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4153,10 +4195,9 @@ processedData <- list(
  "shoppingTripType" = shoppintTripTypeFormatted, #slide 21
  "topPurchaseChannels" = topPurchaseChannelsFormatted, # slide 21
  "pricePaid" = pricePaidFormatted,
- "substitutability" = substitutabilityFormatted
-#  "substitutability" = formatted.slide21.r2c2.Q23.subst,
-#  "occasionType" = formatted.slide21.r2c3.Q26.occtype,
-#  "intendedUser" = formatted.slide21.r2c4.Q25.user,
+ "substitutability" = substitutabilityFormatted,
+ "typeOfOccasion" = typeOfOccasionFormatted,
+ "intendedUser" = intendedUserForamtted
 #  "last.purchase.physical.planned" = formatted.slide22.Q21.22.c1.lastpurchphysplan,
 #  "last.purchase.physical.spontaneous" = formatted.slide22.Q21.22.c2.lastpurchphysspont,
 #  "last.purchase.online.fulfillment" = formatted.slide23.Q20to22.c1.lastpurchonlinefulfill,
