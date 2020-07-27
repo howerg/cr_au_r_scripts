@@ -2834,8 +2834,7 @@ Q17.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # # # hard-coded labels:
-  names(pct.level) <-
-    c(
+  keyOrder <- c(
       "Stock Up",
       "Running Low / Fill In",
       "Same Day Use",
@@ -2844,16 +2843,33 @@ Q17.Single.Column <- function(curr.id, n.level, report.level) {
       "Sale visit",
       "Had coupon"
     )
+  names(pct.level) <- keyOrder
+
   
-  pct.level.order <- order(pct.level, decreasing = TRUE)
+  pct.level.order <- order(pct.level, decreasing = FALSE)
   pct.level.sorted <- pct.level[pct.level.order]
+
+  data <- as.data.frame(pct.level.sorted[report.level])
+  colnames(data) <- c('value')
+  keyOrder <- rownames(data)
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level.sorted[report.level]),
     "title" = "Shopping Trip Type",
     "orientation" = "h",
-    "curr.id" = curr.id
+    "curr.id" = curr.id,
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'questionID' = curr.id,
+      'orientation' = "h",
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -2976,11 +2992,27 @@ Top.Purchase.Channels <- function(source.data, n.top) {
     rollup$rollup
   )
   
+  data <- as.data.frame(chart.data)
+  keyOrder <- rownames(chart.data)
+  colnames(data) <- c('value')
+  
+
   result <- list(
     "n.valid" = source.data$n.respondent,
     "pct.response" = as.data.frame(chart.data),
     "title" = "Top Purchase Channels",
-    "curr.id" = c("Q18", "Q19")
+    "curr.id" = c("Q18", "Q19"),
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = source.data$n.respondent,
+      'questionID' = c("Q18", "Q19"),
+      'orientation' = "v",
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -3029,15 +3061,31 @@ Trip.Type <- function() {
   
   ### label
   
-  names(Q24r.pct.purchase.frequency.level) <-
+  keyOrder <-
     c("Regular", "On Sale", "Coupon")
+  #print(paste(typeof(unlist(Q24r.pct.purchase.frequency.level, use.names=FALSE)), ' and keyOrder', typeof(keyOrder)))
+  dataAsList <- unlist(Q24r.pct.purchase.frequency.level, use.names=FALSE)
+  data <- data.frame('value'=dataAsList, 'attribute'=keyOrder)
+ # keyOrder <- rownames(data)
   
   result <- list(
     "pct.response" = Q24r.pct.purchase.frequency.level,
     "title" = "Price Paid",
     "n.valid" = Q24r.n.valid,
     "curr.id" = "Q24",
-    "orientation" = "h"
+    "orientation" = "h",
+    'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = Q24r.n.valid,
+      'chartType' = 'bar',
+      'questionID' = "Q24",
+      'orientation' = "v",
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
   
 }
@@ -3937,6 +3985,20 @@ brandTopFeaturesFormatted[['tableData']] <- convertToGridTableFormat(out.slide15
 lastBrandPurchaseFormatted <- returnChartDataAndMetaData(
   out.slide21.r1c1.Q16.lastbrandpurch.HB
 )
+
+
+shoppintTripTypeFormatted <- returnChartDataAndMetaData(
+  out.slide21.r1c2.Q17.triptype.HB
+)
+
+topPurchaseChannelsFormatted <- returnChartDataAndMetaData(
+  out.slide21.r1c3.Q19Q18.channels.VB
+)
+
+
+pricePaidFormatted <- returnChartDataAndMetaData(
+  out.slide21.r2c1.Q24.pricepaid.VB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4068,8 +4130,11 @@ processedData <- list(
   ##### categoryDriversAnalysis Slide 20 is missing ###########
 #  "pmap" = formatted.slide19.q15.pmap,
 
- "lastBrandPurchased" = lastBrandPurchaseFormatted
-#  "tripType" = formatted.slide21.r1c2.Q17.triptype,
+ "lastBrandPurchased" = lastBrandPurchaseFormatted, #slide 21
+ "shoppingTripType" = shoppintTripTypeFormatted, #slide 21
+ "topPurchaseChannels" = topPurchaseChannelsFormatted, # slide 21
+ "pricePaid" = pricePaidFormatted
+
 #  "topChannels" = formatted.slide21.r1c3.Q19Q18.channel,
 #  "pricePaid" = formatted.slide21.r2c1.Q24.pricepaid,
 #  "substitutability" = formatted.slide21.r2c2.Q23.subst,
