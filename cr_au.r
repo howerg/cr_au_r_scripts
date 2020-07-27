@@ -2688,6 +2688,11 @@ Horizontal.Bar.Chart.Subset <-
       select.count$pct.response[order.positive.pct.response]
     sort.n.valid <-
       select.count$n.valid[order.positive.pct.response]
+
+    keyOrder <- colnames(sort.pct.response)
+    data <- sort.pct.response
+    transposedData <- as.data.frame(t(as.matrix(data)))
+    colnames(transposedData) <- c('value')
     
     supplement <- list("prep" = prep.string,
                        "pct.prep" = prep.map$n / n.location)
@@ -2698,7 +2703,18 @@ Horizontal.Bar.Chart.Subset <-
       "curr.id" = c("Q21", "Q22"),
       "orientation" = "h",
       "title" = paste(location.string, prep.string),
-      "supplement" = supplement
+      "supplement" = supplement,
+      'data' = transposedData,
+      'keyOrder' = keyOrder,
+      'baseSize' = sort.n.valid,
+      'questionID' = c("Q21", "Q22"),
+      'orientation' = "h",
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
     )
   }
 
@@ -4060,6 +4076,16 @@ typeOfOccasionFormatted <- returnChartDataAndMetaData(
 intendedUserForamtted <- returnChartDataAndMetaData(
   out.slide21.r2c4.Q25.user.HB
 )
+
+
+plannedFormatted <-returnChartDataAndMetaData(
+  out.slide22.Q21.22.lastpurchphys$planned
+)
+
+spontaneousFormatted <-returnChartDataAndMetaData(
+  out.slide22.Q21.22.lastpurchphys$spontaneous
+)
+
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4194,10 +4220,13 @@ processedData <- list(
  "lastBrandPurchased" = lastBrandPurchaseFormatted, #slide 21
  "shoppingTripType" = shoppintTripTypeFormatted, #slide 21
  "topPurchaseChannels" = topPurchaseChannelsFormatted, # slide 21
- "pricePaid" = pricePaidFormatted,
- "substitutability" = substitutabilityFormatted,
- "typeOfOccasion" = typeOfOccasionFormatted,
- "intendedUser" = intendedUserForamtted
+ "pricePaid" = pricePaidFormatted, #slide 21
+ "substitutability" = substitutabilityFormatted, #slide 21
+ "typeOfOccasion" = typeOfOccasionFormatted, #slide 21
+ "intendedUser" = intendedUserForamtted, #slide 21
+
+ "physicalStore1" = plannedFormatted, #slide 22
+ "physicalStore2" = spontaneousFormatted #slide 22
 #  "last.purchase.physical.planned" = formatted.slide22.Q21.22.c1.lastpurchphysplan,
 #  "last.purchase.physical.spontaneous" = formatted.slide22.Q21.22.c2.lastpurchphysspont,
 #  "last.purchase.online.fulfillment" = formatted.slide23.Q20to22.c1.lastpurchonlinefulfill,
