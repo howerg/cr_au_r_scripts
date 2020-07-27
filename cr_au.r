@@ -476,7 +476,7 @@ Rollup.From.ID <-
 
 
 Data.Labeled.Level.Count <-
-  function (numeric.data, level.label, sort = FALSE) {
+  function (numeric.data, level.label, sort = FALSE, decrease = TRUE) {
     # Data.Level.Count returns a list of
     #   n.max : the number of rows in numeric.data
     #   n.valid : for each data column, the number of valid responses
@@ -502,7 +502,7 @@ Data.Labeled.Level.Count <-
     }
     
     if (sort) {
-      order.index <- order(as.vector(n.response), "decreasing" = TRUE)
+      order.index <- order(as.vector(n.response), "decreasing" = decrease)
       n.response <- as.data.frame(n.response[order.index,])
       pct.response <- as.data.frame(pct.response[order.index,])
       level.label <- level.label[order.index]
@@ -2776,18 +2776,35 @@ Q16.Single.Column.With.Significance <-
     
     curr.count <-
       Data.Labeled.Level.Count(curr.data, id.data$`level description`$title,
-                               sort = TRUE)
+                               sort = TRUE, decrease = FALSE)
     
     significance <-
       Multinomial.Significance.Test(curr.count$n.response, p.value)
     
+
+    name <-colnames(curr.count$pct.response)
+    data <- curr.count$pct.response
+    keyOrder <- rownames(data)
+    colnames(data) <- c('value')
+
     result <- list(
       "n.valid" = curr.count$n.valid,
       "pct.response" = curr.count$pct.response,
       "supplement" = significance,
       "title" = "Last Brand Purchased",
       "curr.id" = curr.id,
-      "orientation" = "h"
+      "orientation" = "h",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = curr.count$n.valid,
+      'questionID' = curr.id,
+      'orientation' = "h",
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
     )
   }
 ##############################################################
@@ -3916,6 +3933,10 @@ convertToGridTableFormat <- function(obj){
 brandTopFeaturesFormatted[['tableData']] <- convertToGridTableFormat(out.slide1516.Q15.brandperf.UK)
 
 
+
+lastBrandPurchaseFormatted <- returnChartDataAndMetaData(
+  out.slide21.r1c1.Q16.lastbrandpurch.HB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4042,11 +4063,12 @@ processedData <- list(
   "likelihoodToRecommendBrand" = likelihoodToRecommendBrandFormatted, #formatted.slide14.c2.q13.brandreclikelihood, # slide 14
   "categoryBrandTopFeatures"= brandTopFeaturesFormatted, # slide 17, 18 out.slide1516.Q15.brandperf.UK         #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
 
-  "brandPerceptualMap" = out.slide19.q15.pmap.SP # slide 19 don't know which row maps to which attribute or brand?
+  "brandPerceptualMap" = out.slide19.q15.pmap.SP,  # slide 19 don't know which row maps to which attribute or brand?
 
+  ##### categoryDriversAnalysis Slide 20 is missing ###########
 #  "pmap" = formatted.slide19.q15.pmap,
 
-#  "lastBrandPurchased" = formatted.slide21.r1c1.Q16.lastbrandpurch,
+ "lastBrandPurchased" = lastBrandPurchaseFormatted
 #  "tripType" = formatted.slide21.r1c2.Q17.triptype,
 #  "topChannels" = formatted.slide21.r1c3.Q19Q18.channel,
 #  "pricePaid" = formatted.slide21.r2c1.Q24.pricepaid,
