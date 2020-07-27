@@ -3079,7 +3079,6 @@ Trip.Type <- function() {
       'baseSize' = Q24r.n.valid,
       'chartType' = 'bar',
       'questionID' = "Q24",
-      'orientation' = "v",
       'colors' = c("#71952c",
             "#92b64e",
             "#92c039",
@@ -3117,10 +3116,14 @@ Q23.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-  names(pct.level) <-
+
+  keyOrder <-
     c("Go Elsewhere for Brand",
       "Buy Another Brand",
       "Purchase Nothing in Category")
+ # names(pct.level) <- keyOrder
+  print(paste(typeof(pct.level[report.level]), ' the type'))
+  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder)#as.data.frame('value'=pct.level[report.level], 'attribute'=keyOrder)
   
   
   result <- list(
@@ -3128,7 +3131,18 @@ Q23.Single.Column <- function(curr.id, n.level, report.level) {
     "pct.response" = as.data.frame(pct.level[report.level]),
     "title" = "Substitutability",
     "curr.id" = curr.id,
-    "chart.type" = "pie"
+    "chartType" = "pie",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'chartType' = 'bar',
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -3999,6 +4013,11 @@ topPurchaseChannelsFormatted <- returnChartDataAndMetaData(
 pricePaidFormatted <- returnChartDataAndMetaData(
   out.slide21.r2c1.Q24.pricepaid.VB
 )
+
+
+substitutabilityFormatted <- returnChartDataAndMetaData(
+  out.slide21.r2c2.Q23.subst.PC
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4133,10 +4152,8 @@ processedData <- list(
  "lastBrandPurchased" = lastBrandPurchaseFormatted, #slide 21
  "shoppingTripType" = shoppintTripTypeFormatted, #slide 21
  "topPurchaseChannels" = topPurchaseChannelsFormatted, # slide 21
- "pricePaid" = pricePaidFormatted
-
-#  "topChannels" = formatted.slide21.r1c3.Q19Q18.channel,
-#  "pricePaid" = formatted.slide21.r2c1.Q24.pricepaid,
+ "pricePaid" = pricePaidFormatted,
+ "substitutability" = substitutabilityFormatted
 #  "substitutability" = formatted.slide21.r2c2.Q23.subst,
 #  "occasionType" = formatted.slide21.r2c3.Q26.occtype,
 #  "intendedUser" = formatted.slide21.r2c4.Q25.user,
