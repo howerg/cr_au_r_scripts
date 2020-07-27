@@ -2482,7 +2482,6 @@ Brand.Perceptual.Map <- function (q15.summary) {
   
   attribute.coordinates <- q15.map$rowcoord
   brand.coordinates <- q15.map$colcoord
-  
   scatterplot.data <-
     rbind(attribute.coordinates[, 1:2],
           brand.coordinates[, 1:2])
@@ -3920,6 +3919,7 @@ brandTopFeaturesFormatted[['tableData']] <- convertToGridTableFormat(out.slide15
 ###JSON FORMATTING EXAMPLE END ###
 
 
+
 ##  formatted.slide14.c2.q13.brandreclikelihood <-
 ##    Pre.Format(out.slide14.c2.q13.brandreclikelihood.HSB)
 ##  formatted.slide1516.Q15.brandperf <-
@@ -4040,8 +4040,12 @@ processedData <- list(
   "recencyBrandUsage" = recencyBrandUsageFormatted, #slide 13
   "brandAffinity" = brandAffinityFormatted, #out.slide14.c1.q12.brandaffinity.HSB #slide 14
   "likelihoodToRecommendBrand" = likelihoodToRecommendBrandFormatted, #formatted.slide14.c2.q13.brandreclikelihood, # slide 14
-  "categoryBrandTopFeatures"= brandTopFeaturesFormatted #out.slide1516.Q15.brandperf.UK         #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
+  "categoryBrandTopFeatures"= brandTopFeaturesFormatted, # slide 17, 18 out.slide1516.Q15.brandperf.UK         #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
+
+  "brandPerceptualMap" = out.slide19.q15.pmap.SP # slide 19 don't know which row maps to which attribute or brand?
+
 #  "pmap" = formatted.slide19.q15.pmap,
+
 #  "lastBrandPurchased" = formatted.slide21.r1c1.Q16.lastbrandpurch,
 #  "tripType" = formatted.slide21.r1c2.Q17.triptype,
 #  "topChannels" = formatted.slide21.r1c3.Q19Q18.channel,
