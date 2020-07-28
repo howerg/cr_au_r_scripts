@@ -3396,7 +3396,6 @@ Q29.Single.Column <- function(curr.id, n.level, report.level) {
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level[report.level]),
     "curr.id" = curr.id,
-    "orientation" = "h",
     "title" = 'Meal Type',
     "orientation" = "h",
       "chartType" = "bar",
@@ -3435,18 +3434,29 @@ Q32.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-  names(pct.level) <-
-    c("On Its Own",
+  keyOrder <- c("On Its Own",
       "In a Recipe",
       "w Meal / Snack")
-  
+
+  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level[report.level]),
     "curr.id" = curr.id,
-    "orientation" = "h",
-    "title" = 'Usage Level'
+    "title" = 'Usage Level',
+     "orientation" = "h",
+      "chartType" = "bar",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -3473,20 +3483,32 @@ Q33.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-  names(pct.level) <-
+  keyOrder <-
     c("Everyday",
       "Reg, but Special",
       "Spcl Fam Occ.",
       "Party",
       "Other")
   
+  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level[report.level]),
     "curr.id" = curr.id,
     "orientation" = "h",
-    "title" = 'Occasion Type'
+    "title" = 'Occasion Type',
+      "chartType" = "bar",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -3516,8 +3538,7 @@ Q28.Single.Column <- function(curr.id, n.level, report.level) {
   pct.level.sorted <- pct.level[pct.level.order]
   
   # hard-coded labels:
-  names(pct.level.sorted) <-
-    c("M",
+  keyOrder <- c("M",
       "T",
       "W",
       "TH",
@@ -3525,13 +3546,26 @@ Q28.Single.Column <- function(curr.id, n.level, report.level) {
       "SA",
       "SU")
   
+  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
+  
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level.sorted),
     "curr.id" = curr.id,
     "orientation" = "h",
-    "title" = 'Day of Week'
+    "title" = 'Day of Week',
+      "chartType" = "bar",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -4160,6 +4194,20 @@ lastBrandConsumedFormatted <- returnChartDataAndMetaData (
 mealTypeFormatted <- returnChartDataAndMetaData(
   out.slide24.r1c2.Q29.mealtype.HB
 )
+
+usageTypeFormatted <- returnChartDataAndMetaData(
+  out.slide24.r1c3.Q32.usagetype.HB
+)
+
+
+ocassionTypeFormatted <- returnChartDataAndMetaData(
+  out.slide24.r1c4.Q33.occtype.HB
+)
+
+
+dayOfWeekFormatted <- returnChartDataAndMetaData(
+  out.slide24.r2c1.Q28.dayofweek.HB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4307,10 +4355,11 @@ processedData <- list(
  "onlinePurchase3" = onlineSpontaneousFormatted,  # slide 23
 
  "lastBrandConsumed" = lastBrandConsumedFormatted, # slide 24
- "mealType" = mealTypeFormatted # slide 24
-#  "meal.type" = formatted.slide24.r1c2.Q29.mealtype,
-#  "usage.type" = formatted.slide24.r1c3.Q32.usagetype,
-#  "occasion.type" = formatted.slide24.r1c4.Q33.occtype,
+ "mealType" = mealTypeFormatted, # slide 24
+ "usageType" = usageTypeFormatted, # slide 24 
+ "occasionType" = ocassionTypeFormatted, # slide 24
+ "dayOfWeek" = dayOfWeekFormatted # slide 24
+
 #  "day.of.week" = formatted.slide24.r2c1.Q28.dayofweek,
 #  "location" = formatted.slide24.r2c2.Q30.location,
 #  "who.with" = formatted.slide24.r2c3.Q31.whowith,
