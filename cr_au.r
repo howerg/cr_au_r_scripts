@@ -482,14 +482,13 @@ Rollup.From.ID <-
       "data" = rollup.pct,
       "questionID" = id,
       'chartType' = 'stackedBar',
-      'colors' = c(
-        "#d4e6c0",
-        "#c0db9c",
-        "#a8d16b",
-        "#92c039",
-        "#92b64e",
-        "#71952c"
-      )
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
     )
   }
 
@@ -579,13 +578,12 @@ Rollup.From.ID.Sorted <-
       "questionID" = id,
       'chartType' = 'stackedBar',
       'colors' = c(
-        "#d4e6c0",
-        "#c0db9c",
-        "#a8d16b",
-        "#92c039",
-        "#92b64e",
-        "#71952c"
-      )
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
     )
   }
 
@@ -620,8 +618,7 @@ Rollup.From.ID.Set.Order <- function (id,
       "#a8d16b",
       "#92c039",
       "#92b64e",
-      "#71952c"
-    )
+      "#71952c")
   )
 }
 
@@ -666,7 +663,13 @@ Single.Stacked.Bar <-
       'keyOrder' = rev(rowNames),
       'chartType' = 'stackedBar',
       'orientation' = 'v',
-      'colors' = c("#83adba", "#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
+      'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
     )
   }
 
@@ -748,14 +751,13 @@ Single.Column.With.Significance <-
       "questionID" = curr.id,
       'chartType' = 'bar',
       'keyOrder' = keyOrder,
-      'colors' = c(
-        "#d4e6c0",
-        "#c0db9c",
-        "#a8d16b",
-        "#92c039",
-        "#92b64e",
-        "#71952c"
-      )
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
       
     )
   }
@@ -803,7 +805,13 @@ S3.Single.Column <- function(curr.id, n.level, report.level) {
     'keyOrder' = c('Male', 'Female'),
     'title' = 'Gender',
     'chartType' = 'pie',
-    'colors' = c("#42b2ac", "#98ca3c"),
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"),
     'orientation' = 'v'
   )
 }
@@ -836,7 +844,13 @@ region.Single.Column <- function(curr.id, n.level, report.level) {
     'chartType' = 'bar',
     'orientation' = 'h',
     'title' = 'Region',
-    'colors' =  c("#00b1ac", "#0398d3", "#99ca3c", "#36d2b4")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
   )
 }
 
@@ -887,7 +901,13 @@ D3.Single.Column <- function(curr.id, n.level, report.level) {
     'keyOrder' = keyOrder,
     'data' = data,
     'title' = 'Income',
-    'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4"),
+      'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"),
     'chartType' = "stackedBar",
     'orientation' = 'v'
     
@@ -979,7 +999,13 @@ Ethnicity <- function() {
     'title' = 'Ethnicity',
     'chartType' = 'stackedBar',
     'orientation' = 'v',
-    'colors' = c("#83adba", "#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
+      'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
   )
   
 }
@@ -1248,8 +1274,7 @@ Household.Composition <- function() {
       "#a8d16b",
       "#92c039",
       "#92b64e",
-      "#71952c"
-    )
+      "#71952c")
   )
   
 }
@@ -1310,7 +1335,13 @@ Age.Single.Column.Infer.N.Level <- function(curr.id, report.level) {
     "data" = data,
     'chartType' = 'stackedBar',
     'orientation' = 'v',
-    'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
   )
 }
 
@@ -1350,7 +1381,13 @@ urban.Single.Column <- function(curr.id, n.level, report.level) {
     "keyOrder" = jsonKeyOrder[-1],
     'chartType' = 'stackedBar',
     'orientation' = 'v',
-    'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
     
   )
 }
@@ -1426,7 +1463,13 @@ Q37 <- function(curr.id, n.level) {
     "chartType" = "stackedBar",
     "keyOrder" = rowNames,
     'orientation' = 'v',
-    'colors' = c("#83adba", "#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
   )
 }
 
@@ -1468,7 +1511,7 @@ Q1.Single.Column <- function(curr.id, n.level, report.level) {
     "title" = "Purchase Recency",
     "subTitle" = paste("How recently have you purchased ", cat.name, "?", sep = ""),
     "questionID" = curr.id,
-    "chartType" = "stackedBar",
+    "chartType" = "bar",
     "keyOrder" = rowNames,
     'orientation' = 'h',
     'colors' = c(
@@ -1477,8 +1520,7 @@ Q1.Single.Column <- function(curr.id, n.level, report.level) {
       "#a8d16b",
       "#92c039",
       "#92b64e",
-      "#71952c"
-    )
+      "#71952c")
   )
 }
 
@@ -1556,7 +1598,7 @@ Q3 <- function(curr.id, n.level) {
     "title" = "Purchase Frequency",
     "subTitle" = paste("How often do you personally purchase ", cat.name, "?", sep = ""),
     "questionID" = curr.variables,
-    "chartType" = "stackedBar",
+    "chartType" = "bar",
     "keyOrder" = rowNames,
     'orientation' = 'h',
     'colors' = c(
@@ -2042,7 +2084,7 @@ Q8 <- function(curr.id, max.valid.row) {
     "chartType" = "bar",
     "title" = "% Aided Brand Awareness",
     "baseSize" = curr.count$n.valid[aided.order][[1]],
-    "data" = curr.pct.response[, aided.order],
+    "data" = data.frame('value'=unlist(curr.pct.response[, aided.order], use.names=FALSE),'attribute'=rowNames),
     "questionID" = curr.id,
     "orientation" = 'v',
     'colors' = c(
@@ -2487,14 +2529,14 @@ Q5 <- function(curr.id, n.top, n.level) {
     "data" = transposedData,
     "questionID" = curr.id,
     "orientation" = "v",
+    'chartType' = 'stackedBar',
     'colors' = c(
-      "#71952c",
-      "#92b64e",
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
       "#92c039",
-      "#92c039",
       "#92b64e",
-      "#71952c"
-    ),
+      "#71952c"),
     'keyOrder' = rowNames
   )
 }
@@ -2805,14 +2847,13 @@ Horizontal.Bar.Chart.Subset <-
       'chartType' = 'bar',
       'questionID' = c("Q21", "Q22"),
       'orientation' = "h",
-      'colors' = c(
-        "#71952c",
-        "#92b64e",
-        "#92c039",
-        "#92c039",
-        "#92b64e",
-        "#71952c"
-      )
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c")
     )
   }
 
@@ -2923,6 +2964,7 @@ Q16.Single.Column.With.Significance <-
       'keyOrder' = keyOrder,
       'baseSize' = curr.count$n.valid,
       'questionID' = curr.id,
+      'chartType' = 'bar',
       'orientation' = "h",
       'colors' = c(
         "#71952c",
@@ -2991,6 +3033,7 @@ Q17.Single.Column <- function(curr.id, n.level, report.level) {
     'baseSize' = n.valid,
     'questionID' = curr.id,
     'orientation' = "h",
+    'chartType' = 'bar',
     'colors' = c(
       "#71952c",
       "#92b64e",
@@ -3136,6 +3179,7 @@ Top.Purchase.Channels <- function(source.data, n.top) {
     'baseSize' = source.data$n.respondent,
     'questionID' = c("Q18", "Q19"),
     'orientation' = "v",
+    'chartType' = 'bar',
     'colors' = c(
       "#71952c",
       "#92b64e",
@@ -3332,8 +3376,8 @@ Q26.Single.Column <- function(curr.id, n.level, report.level) {
     "title" = "Occasion Type",
     "chart.type" = "stacked bar",
     "chartType" = "stackedBar",
-    'data' = transposedData,
-    'keyOrder' = keyOrder,
+    'data' = rev(transposedData),
+    'keyOrder' = rev(keyOrder),
     'baseSize' = n.valid,
     'chartType' = 'bar',
     'questionID' = curr.id,
@@ -3890,13 +3934,12 @@ Q34.new <- function(curr.id) {
     'baseSize' = curr.n.valid,
     'questionID' = curr.id,
     'colors' = c(
-      "#71952c",
-      "#92b64e",
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
       "#92c039",
-      "#92c039",
       "#92b64e",
-      "#71952c"
-    )
+      "#71952c")
   )
 }
 
@@ -4328,18 +4371,17 @@ splitInHalfAfterRow <- function(obj, splitAfter = 9) {
   atPos1 <- obj
   atPos2 <- obj
   
-  totalNbrRows <- nrow(theData)
-  startAfterSplit <- (splitAfter + 1)
-  
+  totalNbrOfCols <- ncol(theData)
+  startAfterSplit <- (splitAfter + 1)  
   keyOrder <- colnames(theData)
   
   atPos2[['data']] <-
     data.frame('value' = unlist(theData[1:splitAfter], use.names = FALSE),
                'attribute' = keyOrder[1:splitAfter])
   atPos1[['data']] <-
-    data.frame('value' = unlist(theData[startAfterSplit:totalNbrRows], use.names =
+    data.frame('value' = unlist(theData[startAfterSplit:totalNbrOfCols], use.names =
                                   FALSE),
-               'attribute' = keyOrder[startAfterSplit:totalNbrRows])
+               'attribute' = keyOrder[startAfterSplit:totalNbrOfCols])
   
   result <- list("first" = atPos1,
                  "second" = atPos2)
