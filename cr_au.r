@@ -106,7 +106,6 @@ returnChartDataAndMetaData <- function (object,
   }
 
   if (!is.null(object[['supplement']])) {
-    print(paste('has supplent', object[['questionID']]))
     returnObject[['supplement']] <- object[['supplement']]
   }
   
@@ -3146,7 +3145,7 @@ Q23.Single.Column <- function(curr.id, n.level, report.level) {
       "Buy Another Brand",
       "Purchase Nothing in Category")
  # names(pct.level) <- keyOrder
-  print(paste(typeof(pct.level[report.level]), ' the type'))
+  #print(paste(typeof(pct.level[report.level]), ' the type'))
   data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder)#as.data.frame('value'=pct.level[report.level], 'attribute'=keyOrder)
   
   
