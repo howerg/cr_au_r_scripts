@@ -4359,55 +4359,6 @@ reason2Formatted <- returnChartDataAndMetaData(splitReasons[['second']])
 
 
 
-##  formatted.slide14.c2.q13.brandreclikelihood <-
-##    Pre.Format(out.slide14.c2.q13.brandreclikelihood.HSB)
-##  formatted.slide1516.Q15.brandperf <-
-##    Pre.Format(out.slide1516.Q15.brandperf.UK)
-##
-##  formatted.slide21.r1c1.Q16.lastbrandpurch <-
-##    Pre.Format(out.slide21.r1c1.Q16.lastbrandpurch.HB)
-##  formatted.slide21.r1c2.Q17.triptype <-
-##    Pre.Format(out.slide21.r1c2.Q17.triptype.HB)
-##  formatted.slide21.r1c3.Q19Q18.channel <-
-##    Pre.Format(out.slide21.r1c3.Q19Q18.channels.VB)
-##  formatted.slide21.r2c1.Q24.pricepaid <-
-##    Pre.Format(out.slide21.r2c1.Q24.pricepaid.VB)
-##  formatted.slide21.r2c2.Q23.subst <-
-##    Pre.Format(out.slide21.r2c2.Q23.subst.PC)
-##  formatted.slide21.r2c3.Q26.occtype <-
-##    Pre.Format(out.slide21.r2c3.Q26.occtype.VSB)
-##  formatted.slide21.r2c4.Q25.user <-
-##    Pre.Format(out.slide21.r2c4.Q25.user.HB)
-##  formatted.slide22.Q21.22.c1.lastpurchphysplan  <-
-##    Pre.Format(out.slide22.Q21.22.lastpurchphys$planned)
-##  formatted.slide22.Q21.22.c2.lastpurchphysspont  <-
-##    Pre.Format(out.slide22.Q21.22.lastpurchphys$spontaneous)
-##  formatted.slide23.Q20to22.c1.lastpurchonlinefulfill  <-
-##    Pre.Format(out.slide23.Q20to22.lastpurchonline$fulfillment)
-##  formatted.slide23.Q20to22.c2.lastpurchonlineplan  <-
-##    Pre.Format(out.slide23.Q20to22.lastpurchonline$planned)
-##  formatted.slide23.Q20to22.c3.lastpurchonlinespont  <-
-##    Pre.Format(out.slide23.Q20to22.lastpurchonline$spontaneous)
-##  formatted.slide24.r1c1.q27.lastbrandcons  <-
-##    Pre.Format(out.slide24.r1c1.q27.lastbrandcons.HB)
-##  formatted.slide24.r1c2.Q29.mealtype  <-
-##    Pre.Format(out.slide24.r1c2.Q29.mealtype.HB)
-##  formatted.slide24.r1c3.Q32.usagetype  <-
-##    Pre.Format(out.slide24.r1c3.Q32.usagetype.HB)
-##  formatted.slide24.r1c4.Q33.occtype  <-
-##    Pre.Format(out.slide24.r1c4.Q33.occtype.HB)
-##  formatted.slide24.r2c1.Q28.dayofweek  <-
-##    Pre.Format(out.slide24.r2c1.Q28.dayofweek.HB)
-##  formatted.slide24.r2c2.Q30.location <-
-##    Pre.Format(out.slide24.r2c2.Q30.location.HB)
-##  formatted.slide24.r2c3.Q31.whowith <-
-##    Pre.Format(out.slide24.r2c3.Q31.whowith.HB)
-##  formatted.slide24.r2c4.Q35.reasons <-
-##    Pre.Format(out.slide24.r2c4.Q35.reasons.HB)
-##  formatted.slide25.Q34.reasonchoosebrand. <-
-##    Pre.Format(out.slide25.Q34.reasonchoosebrand.HB)
-
-
 ### Note: As a end output we would expect one list containing all charts eg.:
 ### processedData <- list(aidedAwareness=q8r.bar.chart.list, demoGender=qXYZ.bar.chart.list, demoRegion=qXYZ.bar.chart.list,...)
 ### processedDataJSON <- toJSON(processedData, pretty = TRUE, auto_unbox = TRUE )
@@ -4420,7 +4371,6 @@ reason2Formatted <- returnChartDataAndMetaData(splitReasons[['second']])
 # contents of the "chart lists".  If you can provide us with a desired format,
 # including naming conventions, we can do that.
 
-## We need one chart per sub category as previously stated
 
 returnDataFrameFromRow <- function (dataObj, idx) {
   currentData <- dataObj[['data']][idx]
@@ -4437,9 +4387,6 @@ returnDataFrameFromRow <- function (dataObj, idx) {
   )
   result <- returnChartDataAndMetaData(returnList)
 }
-
-
-
 
 
 
@@ -4468,7 +4415,7 @@ processedData <- list(
   #slide 6
   #### slide 7 charts are appended at the end to processedData via a loop ###
   
-  
+
   ### don't know what these are for START ?
   #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
   #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
