@@ -56,13 +56,15 @@ example.data.map.questions <- example.data.map$questions
 
 
 getSingleSelectRowLabels <- function (id) {
-  q <- subset(example.data.map.variables, qlabel == id) #example.data.map.variables$qlabel[['Q14']]
+  q <-
+    subset(example.data.map.variables, qlabel == id) #example.data.map.variables$qlabel[['Q14']]
   qTextLabels <- q$values[[1]][['title']]
   result <- qTextLabels
 }
 
 getSingleSelectRowValues <- function (id) {
-  q <- subset(example.data.map.variables, qlabel == id) #example.data.map.variables$qlabel[['Q14']]
+  q <-
+    subset(example.data.map.variables, qlabel == id) #example.data.map.variables$qlabel[['Q14']]
   qTextLabels <- q$values[[1]][['value']]
   result <- qTextLabels
 }
@@ -86,14 +88,26 @@ returnChartDataAndMetaData <- function (object,
     'dataValue' = dataValue,
     'baseSize' = object[['baseSize']],
     'average' = average,
-    'chartType' = if(!is.null(object[['chartType']])) object[['chartType']] else chartType,
-    'orientation' = if(!is.null(object[['orientation']])) object[['orientation']] else orientation,
+    'chartType' = if (!is.null(object[['chartType']]))
+      object[['chartType']]
+    else
+      chartType,
+    'orientation' = if (!is.null(object[['orientation']]))
+      object[['orientation']]
+    else
+      orientation,
     'dataType' = dataType,
-    'colors' = if(!is.null(object[['colors']])) object[['colors']] else colors,
+    'colors' = if (!is.null(object[['colors']]))
+      object[['colors']]
+    else
+      colors,
     'keyOrder' = object[['keyOrder']]
   )
   returnObject <- list(
-    'title' = if(!is.null(object[['title']])) object[['title']] else title,
+    'title' = if (!is.null(object[['title']]))
+      object[['title']]
+    else
+      title,
     'xAxisTitle' = xAxisTitle,
     'yAxisTitle' = yAxisTitle,
     'questionID' = object[['questionID']],
@@ -101,10 +115,10 @@ returnChartDataAndMetaData <- function (object,
     'data' = object[['data']]
   )
   
-  if(!is.null(object[['subTitle']])){
+  if (!is.null(object[['subTitle']])) {
     returnObject['subTitle'] <- object[['subTitle']]
   }
-
+  
   if (!is.null(object[['supplement']])) {
     returnObject[['supplement']] <- object[['supplement']]
   }
@@ -112,37 +126,35 @@ returnChartDataAndMetaData <- function (object,
   result <- returnObject
 }
 
-convertTotableDataFormat <- function(data, keys){
+convertTotableDataFormat <- function(data, keys) {
   percent100List <- list()
   for (i in 1:length(data)) {
     # only way I could work out how to map keys list to  a data list
     tempList <- list()
     tempList[keys[i]] = data[i]
-    percent100List[[i]] = tempList 
-
+    percent100List[[i]] = tempList
+    
   }
-  newData = list(
-    'percent100' = percent100List
-  )
+  newData = list('percent100' = percent100List)
   result <- newData
 }
 
 addTableDataKey <- function(object, title, isGrid = TRUE) {
-
   passToFormatObj <- object
-  chartFormat <- returnChartDataAndMetaData(passToFormatObj, title, '', '', 'table')
-
+  chartFormat <-
+    returnChartDataAndMetaData(passToFormatObj, title, '', '', 'table')
+  
   tableContents <- list(
     'baseSize' = object[['baseSize']],
     'type' = 'single',
-    'isGrid'= isGrid,
+    'isGrid' = isGrid,
     'data' = convertTotableDataFormat(object[['data']], object[['keyOrder']])
   )
   tableData <- list()
   tableData[[1]] = tableContents
-
+  
   chartFormat[['tableData']] = tableData
-
+  
   result <- chartFormat
 }
 
@@ -154,15 +166,20 @@ addTableDataKey <- function(object, title, isGrid = TRUE) {
 
 ##### DATAFRAME HELPERS START #######
 ### DataFrame Helpers start ###
-createDataFrameOfTwoLists <- function(list1, list2, startDigitsAt = 2) {
-  options(digits=5)
-  df <- data.frame()[1:1, ]
-  for (i in 1:length(list1)) {
-    df[[list1[i]]] <- if(i>=startDigitsAt) as.double(list2[i]) else list2[i]
+createDataFrameOfTwoLists <-
+  function(list1, list2, startDigitsAt = 2) {
+    options(digits = 5)
+    df <- data.frame()[1:1,]
+    for (i in 1:length(list1)) {
+      df[[list1[i]]] <-
+        if (i >= startDigitsAt)
+          as.double(list2[i])
+      else
+        list2[i]
+    }
+    rownames(df) <- NULL
+    result <- df
   }
-  rownames(df) <- NULL
-  result <- df
-}
 
 
 # names(example.data.map.variables)
@@ -176,7 +193,7 @@ createDataFrameOfTwoLists <- function(list1, list2, startDigitsAt = 2) {
 Field.From.Map <- function(raw.data, data.map, field.name) {
   dmv <- data.map$variables
   vx.field <- grep(field.name, dmv$vgroup)
-  field.variables <- dmv[vx.field, ]
+  field.variables <- dmv[vx.field,]
   field.variable.labels <- field.variables$label
   
   dmq <- data.map$questions # a data.frame
@@ -304,14 +321,14 @@ Data.Level.Count <- function (numeric.data, n.level) {
   n.max <- nrow(numeric.data)
   n.valid <- n.max - colSums(is.na(numeric.data))
   
-  n.response <- as.data.frame(numeric.data[0, ])
+  n.response <- as.data.frame(numeric.data[0,])
   pct.response <- n.response
   
   for (ix in 1:n.level) {
-    n.response[ix, ] <-
+    n.response[ix,] <-
       apply(numeric.data, 2, function(x)
         sum(x == ix, na.rm = TRUE))
-    pct.response[ix, ] <- n.response[ix, ] / n.valid
+    pct.response[ix,] <- n.response[ix,] / n.valid
   }
   
   result <-
@@ -367,7 +384,7 @@ Variable.From.Question <-
     data.map.index <-
       grep(pattern, example.data.map.variables$label)
     data.map.variable <-
-      example.data.map.variables[data.map.index,]
+      example.data.map.variables[data.map.index, ]
     
     variable.index <-
       grep(pattern, example.raw.data.variables, fixed = fixed)
@@ -441,12 +458,12 @@ Rollup.From.ID <-
     
     n.rollup.level = length(level.rollup)
     
-    rollup.pct <- as.data.frame(data.pct[0, ])
+    rollup.pct <- as.data.frame(data.pct[0,])
     
     for (ix in 1:n.rollup.level) {
       ix.rollup <- unlist(level.rollup[ix])
       
-      rollup.pct[ix, ] = colSums(data.pct[ix.rollup, ])
+      rollup.pct[ix,] = colSums(data.pct[ix.rollup,])
     }
     
     rownames(rollup.pct) <- rollup.desc
@@ -465,18 +482,23 @@ Rollup.From.ID <-
       "data" = rollup.pct,
       "questionID" = id,
       'chartType' = 'stackedBar',
-      'colors' = c("#d4e6c0",
-            "#c0db9c",
-            "#a8d16b",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+      'colors' = c(
+        "#d4e6c0",
+        "#c0db9c",
+        "#a8d16b",
+        "#92c039",
+        "#92b64e",
+        "#71952c"
+      )
     )
   }
 
 
 Data.Labeled.Level.Count <-
-  function (numeric.data, level.label, sort = FALSE, decrease = TRUE) {
+  function (numeric.data,
+            level.label,
+            sort = FALSE,
+            decrease = TRUE) {
     # Data.Level.Count returns a list of
     #   n.max : the number of rows in numeric.data
     #   n.valid : for each data column, the number of valid responses
@@ -491,20 +513,20 @@ Data.Labeled.Level.Count <-
     
     column.name <- colnames(numeric.data)
     
-    n.response <- as.data.frame(numeric.data[0, ])
+    n.response <- as.data.frame(numeric.data[0,])
     pct.response <- n.response
     
     for (ix in 1:n.level) {
-      n.response[ix, ] <-
+      n.response[ix,] <-
         apply(numeric.data, 2, function(x)
           sum(x == ix, na.rm = TRUE))
-      pct.response[ix, ] <- n.response[ix, ] / n.valid
+      pct.response[ix,] <- n.response[ix,] / n.valid
     }
     
     if (sort) {
       order.index <- order(as.vector(n.response), "decreasing" = decrease)
-      n.response <- as.data.frame(n.response[order.index,])
-      pct.response <- as.data.frame(pct.response[order.index,])
+      n.response <- as.data.frame(n.response[order.index, ])
+      pct.response <- as.data.frame(pct.response[order.index, ])
       level.label <- level.label[order.index]
     } else {
       order.index <- 1:n.level
@@ -538,14 +560,14 @@ Rollup.From.ID.Sorted <-
       Rollup.From.ID(id, level.rollup, rollup.desc, rollup.title)
     
     order.index <-
-      order(rollup.raw$pct.response[rollup.sort.index, ],
+      order(rollup.raw$pct.response[rollup.sort.index,],
             "decreasing" = TRUE)
     
     result <- list(
       "n.level" = rollup.raw$n.level,
       "level.label" = rollup.raw$level.label,
       "n.rollup.level" = rollup.raw$n.rollup.level,
-      "n.respondent" = rollup.raw$n.respondent[ ,order.index],
+      "n.respondent" = rollup.raw$n.respondent[, order.index],
       "curr.id" = id,
       "n.valid" = rollup.raw$n.valid,
       "pct.response" = rollup.raw$pct.response[, order.index],
@@ -556,12 +578,14 @@ Rollup.From.ID.Sorted <-
       'baseSize' = rollup.raw$n.valid,
       "questionID" = id,
       'chartType' = 'stackedBar',
-      'colors' = c("#d4e6c0",
-            "#c0db9c",
-            "#a8d16b",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+      'colors' = c(
+        "#d4e6c0",
+        "#c0db9c",
+        "#a8d16b",
+        "#92c039",
+        "#92b64e",
+        "#71952c"
+      )
     )
   }
 
@@ -590,12 +614,14 @@ Rollup.From.ID.Set.Order <- function (id,
     'baseSize' = rollup.raw$n.valid,
     "questionID" = id,
     'chartType' = 'stackedBar',
-    'colors' = c("#d4e6c0",
-          "#c0db9c",
-          "#a8d16b",
-          "#92c039",
-          "#92b64e",
-          "#71952c")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -617,22 +643,26 @@ Single.Column.Data <- function(id) {
 
 Single.Stacked.Bar <-
   function(id, sort.order = 'decreasing', title) {
-
     rowNames <- getSingleSelectRowLabels(id)
     id.data <- Single.Column.Data(id)
     row.name <- rownames(id.data$data)
     level.count <- Data.Level.Count(id.data$data, id.data$n.level)
     rownames(level.count$n.response) <- rowNames
     rownames(level.count$pct.response) <- rowNames
-
-    transposedData <- as.data.frame(t(as.matrix(level.count$pct.response)))
+    
+    transposedData <-
+      as.data.frame(t(as.matrix(level.count$pct.response)))
     
     result <- list(
       "baseSize" = level.count$n.valid,
       "data" = rev(transposedData),
       "questionID" = id,
       "title" = title,
-      "subTitle" = paste('How satisfied are you with the', cat.name , 'brands currently available?'),
+      "subTitle" = paste(
+        'How satisfied are you with the',
+        cat.name ,
+        'brands currently available?'
+      ),
       'keyOrder' = rev(rowNames),
       'chartType' = 'stackedBar',
       'orientation' = 'v',
@@ -654,7 +684,7 @@ Multinomial.Significance.Test <- function(n.observed, p.value) {
   p.1 <- 0.5 * (1 - p.value)
   
   significance <- n.observed
-  significance[, ] <- ""
+  significance[,] <- ""
   
   letters <- Letter.Labels(n.alternative)
   
@@ -698,10 +728,10 @@ Single.Column.With.Significance <-
     
     combined <- cbind(curr.count$pct.response, significance)
     colnames(combined) <- c("pct", "significance")
-
+    
     colnames(curr.count$pct.response) <- c('value')
     
-
+    
     keyOrder <- rownames(curr.count$pct.response)
     result <- list(
       "title" = "Last Brand Consumed",
@@ -718,13 +748,15 @@ Single.Column.With.Significance <-
       "questionID" = curr.id,
       'chartType' = 'bar',
       'keyOrder' = keyOrder,
-      'colors' = c("#d4e6c0",
-            "#c0db9c",
-            "#a8d16b",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
-    
+      'colors' = c(
+        "#d4e6c0",
+        "#c0db9c",
+        "#a8d16b",
+        "#92c039",
+        "#92b64e",
+        "#71952c"
+      )
+      
     )
   }
 
@@ -754,7 +786,7 @@ S3.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -785,7 +817,7 @@ region.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -818,40 +850,37 @@ D3.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
     unlist(lapply(1:n.level, function(x)
       sum(valid.data == x))) / n.valid
   
-  pct.level[n.level+1] <- sum(pct.level[3:4])
-  pct.level[n.level+2] <- sum(pct.level[5:6])
+  pct.level[n.level + 1] <- sum(pct.level[3:4])
+  pct.level[n.level + 2] <- sum(pct.level[5:6])
   #pct.level[n.level+2] <- sum(pct.level[(n.level-1):n.level])
   
   # hard-coded labels:
   jsonDataKeyOrder <-
-    c("attribute",    
+    c("attribute",
       "$100k+",
       "$50-$99k",
       "$25-$49k",
-      "<$25k"
-    )
-
+      "<$25k")
   
-  valuesOrder <- c("Income", rev(pct.level[report.level]) )
+  
+  valuesOrder <- c("Income", rev(pct.level[report.level]))
   
   data <- createDataFrameOfTwoLists(jsonDataKeyOrder, valuesOrder)
   
   
   
-    keyOrder <-
-    c(
-      "$100k+",
+  keyOrder <-
+    c("$100k+",
       "$50-$99k",
       "$25-$49k",
-      "<$25k"
-    )
+      "<$25k")
   result <- list(
     'questionID' = curr.id,
     'baseSize' = n.valid,
@@ -929,17 +958,17 @@ Ethnicity <- function() {
     unlist(lapply(1:5, function(x)
       sum(S5.valid.race_collapse == x))) / S5.n.valid
   
- jsonDataKeyOrder <-
+  jsonDataKeyOrder <-
     c("attribute",
       "Caucasian",
       "AA",
       "Hispanic",
       "Asian",
       "All Other")
-
+  
   valuesOrder <- c("Ethnicity", ethnicity.result)
-
-  data <- createDataFrameOfTwoLists(jsonDataKeyOrder,valuesOrder)
+  
+  data <- createDataFrameOfTwoLists(jsonDataKeyOrder, valuesOrder)
   
   result <- list(
     "title" = "Ethnicity",
@@ -972,7 +1001,7 @@ HHSize.Single.Column.Infer.N.Level <-
     
     ix.valid <- which(!is.na(curr.data))
     n.valid <- length(ix.valid)
-    valid.data <- curr.data[ix.valid, ]
+    valid.data <- curr.data[ix.valid,]
     
     data.level <- unique(valid.data)
     n.level <- length(data.level)
@@ -1006,7 +1035,7 @@ HHSize.Single.Column.Infer.N.Level <-
       "keyOrder" = keyOrder,
       "data" = pct.level[report.level],
       'chartType' = 'table',
-      'orientation' = 'v'  
+      'orientation' = 'v'
     )
   }
 
@@ -1187,7 +1216,8 @@ Household.Composition <- function() {
   
   # hard-coded labels:
   jsonKeyOrder <-
-    c("Other",
+    c(
+      "Other",
       "Multi - Gen",
       "Singl Parent, kids",
       "Married, kids",
@@ -1195,8 +1225,8 @@ Household.Composition <- function() {
       "Single Person"
     )
   
-
-  data = data.frame('attribute'=jsonKeyOrder, 'value'=hhcomp)
+  
+  data = data.frame('attribute' = jsonKeyOrder, 'value' = hhcomp)
   rownames(data) <- NULL
   result <- list(
     "title" = "Household Composition",
@@ -1212,12 +1242,14 @@ Household.Composition <- function() {
       "HHcompr7"
     ),
     "orientation" = "h",
-    'colors' = c( "#d4e6c0",
-                  "#c0db9c",
-                  "#a8d16b",
-                  "#92c039",
-                  "#92b64e",
-                  "#71952c")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
   
 }
@@ -1240,7 +1272,7 @@ Age.Single.Column.Infer.N.Level <- function(curr.id, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid, ]
+  valid.data <- curr.data[ix.valid,]
   
   data.level <- unique(valid.data)
   n.level <- length(data.level)
@@ -1260,23 +1292,23 @@ Age.Single.Column.Infer.N.Level <- function(curr.id, report.level) {
     unlist(lapply(1:4, function(x)
       sum(valid.data == x))) / n.valid
   
-
-  jsonKeyOrder<-
+  
+  jsonKeyOrder <-
     c("attribute",
       "GenZ",
       "Millenial",
       "GenX",
       "Boomer")
   valuesOrder <- c("Generation", pct.level)
-  data <- createDataFrameOfTwoLists(jsonKeyOrder,valuesOrder)
+  data <- createDataFrameOfTwoLists(jsonKeyOrder, valuesOrder)
   
   result <- list(
     "baseSize" = n.valid,
     "title" = "Generations",
     "questionID" = curr.id,
-    'keyOrder'= jsonKeyOrder[-1],
+    'keyOrder' = jsonKeyOrder[-1],
     "data" = data,
-    'chartType'= 'stackedBar',
+    'chartType' = 'stackedBar',
     'orientation' = 'v',
     'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
   )
@@ -1289,24 +1321,24 @@ urban.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid, ]
+  valid.data <- curr.data[ix.valid,]
   
   # count the number of responses for each variable
   pct.level <-
     unlist(lapply(1:n.level, function(x)
       sum(valid.data == x))) / n.valid
   
-
-
-  jsonKeyOrder<-
+  
+  
+  jsonKeyOrder <-
     c("attribute",
       "Rural",
       "Small town",
       "Suburb",
       "City")
   valuesOrder <- c("Urbanicity", rev(pct.level))
-  data <- createDataFrameOfTwoLists(jsonKeyOrder,valuesOrder)
-
+  data <- createDataFrameOfTwoLists(jsonKeyOrder, valuesOrder)
+  
   
   result <- list(
     "baseSize" = n.valid,
@@ -1316,10 +1348,10 @@ urban.Single.Column <- function(curr.id, n.level, report.level) {
     "chartType" = "stackedBar",
     "orientation" = "v",
     "keyOrder" = jsonKeyOrder[-1],
-    'chartType'= 'stackedBar',
+    'chartType' = 'stackedBar',
     'orientation' = 'v',
     'colors' = c("#42b2ac", "#bddbe8", "#98ca3c", "#56d2b4")
-  
+    
   )
 }
 
@@ -1359,7 +1391,7 @@ Q37 <- function(curr.id, n.level) {
   
   data.map.index <-
     grep(curr.pattern, example.data.map.variables$label)
-  data.map.variable <- example.data.map.variables[data.map.index,]
+  data.map.variable <- example.data.map.variables[data.map.index, ]
   level.string <- data.map.variable$values[1][[1]]$title
   
   
@@ -1371,24 +1403,25 @@ Q37 <- function(curr.id, n.level) {
     'In favor, but have taken no action',
     'Strongly in favor and behavior reflects'
   )
-
+  
   colNames <- c(
     'Spending more on products better for the environment',
     'Purchasing brands from companies committed to animal welfare',
     'Buying from companies that commit to carbon neutral future',
     'For all to help in the recycling effort'
   )
-
+  
   rownames(curr.pct.response) <- rowNames #level.string
-  colnames(curr.pct.response) <- colNames #data.map.variable$rowTitle
+  colnames(curr.pct.response) <-
+    colNames #data.map.variable$rowTitle
   #row.names(curr.pct.response) <- c('attribute')
- # curr.pct.response.row.names <- 'attribute'
+  # curr.pct.response.row.names <- 'attribute'
   transposedData <- as.data.frame(t(as.matrix(curr.pct.response)))
   result <- list(
     "baseSize" = curr.count$n.valid,
     "data" = transposedData,
     "title" = "Sustainability Attitudes",
-    "subTitle"= "Please tell us how you would classify each statement",
+    "subTitle" = "Please tell us how you would classify each statement",
     "questionID" = curr.id,
     "chartType" = "stackedBar",
     "keyOrder" = rowNames,
@@ -1405,7 +1438,7 @@ Q1.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid, ]
+  valid.data <- curr.data[ix.valid,]
   
   # count the number of responses for each variable
   pct.level <-
@@ -1415,37 +1448,37 @@ Q1.Single.Column <- function(curr.id, n.level, report.level) {
   pct.level[n.level + 1] <- sum(pct.level[1:3])
   pct.level[n.level + 2] <- sum(pct.level[(n.level - 1):n.level])
   
-
-  rowNames <-c(
-      "Weekly",
-      "Every 2 - 3 weeks",
-      "Monthly",
-      "NET Monthly or More",
-      "Every 2 - 3 Months",
-      "Every 4 - 6 Months",
-      "Every 7 - 12 Months",
-      " < 1 x Year"
-    )
-
-  data <- data.frame(
-      'attribute' = rowNames,
-      'value' = pct.level[report.level]
-    )
+  
+  rowNames <- c(
+    "Weekly",
+    "Every 2 - 3 weeks",
+    "Monthly",
+    "NET Monthly or More",
+    "Every 2 - 3 Months",
+    "Every 4 - 6 Months",
+    "Every 7 - 12 Months",
+    " < 1 x Year"
+  )
+  
+  data <- data.frame('attribute' = rowNames,
+                     'value' = pct.level[report.level])
   result <- list(
     "baseSize" = n.valid,
     "data" = data,
     "title" = "Purchase Recency",
-    "subTitle"= paste("How recently have you purchased ",cat.name,"?", sep = ""),
+    "subTitle" = paste("How recently have you purchased ", cat.name, "?", sep = ""),
     "questionID" = curr.id,
     "chartType" = "stackedBar",
     "keyOrder" = rowNames,
     'orientation' = 'h',
-    'colors' = c("#d4e6c0",
-          "#c0db9c",
-          "#a8d16b",
-          "#92c039",
-          "#92b64e",
-          "#71952c")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -1515,22 +1548,25 @@ Q3 <- function(curr.id, n.level) {
       "Every 7 - 12 Months",
       " < 1 x Year"
     )
-  data <- data.frame('attribute'= rowNames, 'value'=output.pct.purchase.frequency)
+  data <-
+    data.frame('attribute' = rowNames, 'value' = output.pct.purchase.frequency)
   result <- list(
     "baseSize" = category.frequency.n.valid,
     "data" = data,
     "title" = "Purchase Frequency",
-    "subTitle"= paste("How often do you personally purchase ",cat.name,"?", sep = ""),
+    "subTitle" = paste("How often do you personally purchase ", cat.name, "?", sep = ""),
     "questionID" = curr.variables,
     "chartType" = "stackedBar",
     "keyOrder" = rowNames,
     'orientation' = 'h',
-    'colors' = c("#d4e6c0",
-          "#c0db9c",
-          "#a8d16b",
-          "#92c039",
-          "#92b64e",
-          "#71952c")
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -1541,7 +1577,7 @@ Q2.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -1684,29 +1720,29 @@ Slide7.Q3 <- function(curr.id, n.level) {
   # roll up some of the levels for output
   out.pct.response <-
     rbind(
-      curr.pct.response[1:3, ],
-      colSums(curr.pct.response[1:3, ]),
-      curr.pct.response[4:6, ],
-      colSums(curr.pct.response[7:8, ])
+      curr.pct.response[1:3,],
+      colSums(curr.pct.response[1:3,]),
+      curr.pct.response[4:6,],
+      colSums(curr.pct.response[7:8,])
     )
   
   rowNames <- c(
-      "Weekly",
-      "Every 2 - 3 Weeks",
-      "Monthly",
-      "NET Monthly + ",
-      "Every 2 - 3 Months",
-      "Every 4 - 6 Months",
-      "Every 7 - 12 Months",
-      " < 1 x Year"
-    )
-
+    "Weekly",
+    "Every 2 - 3 Weeks",
+    "Monthly",
+    "NET Monthly + ",
+    "Every 2 - 3 Months",
+    "Every 4 - 6 Months",
+    "Every 7 - 12 Months",
+    " < 1 x Year"
+  )
+  
   rownames(out.pct.response) <- rowNames
-    
+  
   
   data.map.index <-
     match(row.variable, example.data.map.variables$label)
-  data.map.variable <- example.data.map.variables[data.map.index, ]
+  data.map.variable <- example.data.map.variables[data.map.index,]
   
   colnames(out.pct.response) <- data.map.variable$rowTitle
   
@@ -1717,12 +1753,14 @@ Slide7.Q3 <- function(curr.id, n.level) {
     "title" = "Subcategory Purchase Frequency",
     "orientation" = "h",
     'chartType' = 'bar',
-    'colors' = c("#d4e6c0",
-          "#c0db9c",
-          "#a8d16b",
-          "#92c039",
-          "#92b64e",
-          "#71952c"),
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    ),
     'keyOrder' = rowNames
   )
 }
@@ -1758,18 +1796,18 @@ Slide7a.Q4 <- function(curr.id, n.level) {
   # roll up some of the levels for output
   out.n.response <-
     rbind(
-      curr.n.response[1:5, ],
-      colSums(curr.n.response[1:5, ]),
-      curr.n.response[6:8, ],
-      colSums(curr.n.response[9:10, ])
+      curr.n.response[1:5,],
+      colSums(curr.n.response[1:5,]),
+      curr.n.response[6:8,],
+      colSums(curr.n.response[9:10,])
     )
   
   out.pct.response <-
     rbind(
-      curr.pct.response[1:5, ],
-      colSums(curr.pct.response[1:5, ]),
-      curr.pct.response[6:8, ],
-      colSums(curr.pct.response[9:10, ])
+      curr.pct.response[1:5,],
+      colSums(curr.pct.response[1:5,]),
+      curr.pct.response[6:8,],
+      colSums(curr.pct.response[9:10,])
     )
   
   out.row.names <-
@@ -1791,7 +1829,7 @@ Slide7a.Q4 <- function(curr.id, n.level) {
   
   data.map.index <-
     match(row.variable, example.data.map.variables$label)
-  data.map.variable <- example.data.map.variables[data.map.index, ]
+  data.map.variable <- example.data.map.variables[data.map.index,]
   
   colnames(out.n.response) <- data.map.variable$rowTitle
   colnames(out.pct.response) <- data.map.variable$rowTitle
@@ -1801,7 +1839,7 @@ Slide7a.Q4 <- function(curr.id, n.level) {
   # Pearson's Chi-Square
   
   significance <- out.n.response
-  significance[,] <- ""
+  significance[, ] <- ""
   
   curr.n.valid <- curr.count$n.valid
   out.n.row <- nrow(out.n.response)
@@ -1883,7 +1921,7 @@ Q6 <- function(curr.id, n.level, report.level) {
   
   data.map.index <-
     grep(curr.pattern, example.data.map.variables$label)
-  data.map.variable <- example.data.map.variables[data.map.index,]
+  data.map.variable <- example.data.map.variables[data.map.index, ]
   level.string <- data.map.variable$values[1][[1]]$title
   
   # attach row names
@@ -1891,16 +1929,16 @@ Q6 <- function(curr.id, n.level, report.level) {
   # sort by response percentage of top two levels
   
   report.pct.response.select <-
-    curr.count$pct.response[report.level,]
+    curr.count$pct.response[report.level, ]
   row.names(report.pct.response.select) <-
     level.string[report.level]
   
   
   report.pct.response.top.2 <-
-    report.pct.response.select[1,] +
-    report.pct.response.select[2,]
+    report.pct.response.select[1, ] +
+    report.pct.response.select[2, ]
   row.names(report.pct.response.top.2) <- 'Somewhat/Extremely'
-    #paste(n.level - 1, "+", n.level, sep = "")
+  #paste(n.level - 1, "+", n.level, sep = "")
   
   top.2.order <- order(report.pct.response.top.2, decreasing = TRUE)
   
@@ -1911,10 +1949,11 @@ Q6 <- function(curr.id, n.level, report.level) {
   
   colnames(report.pct.response) <- curr.row.title
   
-
-  transposedData <- as.data.frame(t(as.matrix(report.pct.response[, top.2.order])))
+  
+  transposedData <-
+    as.data.frame(t(as.matrix(report.pct.response[, top.2.order])))
   rowNames <- names(transposedData)
-
+  
   result <- list(
     #"n.valid" = curr.count$n.valid[top.2.order],
     #"n.response" = curr.count$n.response[, top.2.order],
@@ -1927,13 +1966,16 @@ Q6 <- function(curr.id, n.level, report.level) {
     "data" = transposedData,
     "questionID" = curr.variables,
     "orientation" = 'v',
-    'colors' = c("#71952c",
-          "#92b64e",
-          "#92c039",
-          "#92c039",
-          "#92b64e",
-          "#71952c"),
-    'keyOrder' = rowNames)
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    ),
+    'keyOrder' = rowNames
+  )
 }
 
 
@@ -1947,7 +1989,8 @@ Q6 <- function(curr.id, n.level, report.level) {
 Q8 <- function(curr.id, max.valid.row) {
   #we always want to use only names without the image references
   #therefore using this qId qKeyBrands instead of curr.id
-  curr.pattern <- paste('qKeyBrands', "r.+", sep = "")  # using qKeyBrands hardcoded instead of curr.id
+  curr.pattern <-
+    paste('qKeyBrands', "r.+", sep = "")  # using qKeyBrands hardcoded instead of curr.id
   
   # find the variables that begin with the pattern
   curr.variable.index <-
@@ -1975,7 +2018,7 @@ Q8 <- function(curr.id, max.valid.row) {
   
   data.map.index <-
     grep(curr.pattern, example.data.map.variables$label)
-  data.map.variable <- example.data.map.variables[data.map.index,]
+  data.map.variable <- example.data.map.variables[data.map.index, ]
   brand.name <- data.map.variable$rowTitle[1:n.attribute]
   
   colnames(curr.n.response) <- t(brand.name)
@@ -1995,21 +2038,24 @@ Q8 <- function(curr.id, max.valid.row) {
     "aided.order" = aided.order,
     #"key.brands.aided.order" = key.brands.aided.order,
     #"curr.id" = curr.id,
-
+    
     "chartType" = "bar",
     "title" = "% Aided Brand Awareness",
     "baseSize" = curr.count$n.valid[aided.order][[1]],
     "data" = curr.pct.response[, aided.order],
     "questionID" = curr.id,
     "orientation" = 'v',
-    'colors' = c("#71952c",
-          "#92b64e",
-          "#92c039",
-          "#92c039",
-          "#92b64e",
-          "#71952c"),
-    'keyOrder' = rowNames)
-    
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    ),
+    'keyOrder' = rowNames
+  )
+  
   
 }
 
@@ -2138,7 +2184,17 @@ Brand.Funnel <- function(aided.sort.order, aided.sorted.results) {
   
   colnames(Q9.result.sorted) <- colnames(aided.sorted.results)
   
-  rowNames <- c('Aided Aware','Consider','Ever Tried', 'Lapsed', 'Current User', 'Loyalist', 'Trial Conversion', 'Retained Triers' )
+  rowNames <-
+    c(
+      'Aided Aware',
+      'Consider',
+      'Ever Tried',
+      'Lapsed',
+      'Current User',
+      'Loyalist',
+      'Trial Conversion',
+      'Retained Triers'
+    )
   
   result <- list(
     "pct.response" = Q9.result.sorted,
@@ -2150,12 +2206,14 @@ Brand.Funnel <- function(aided.sort.order, aided.sorted.results) {
     'baseSize' = n.valid,
     'chartType' = 'bar',
     'questionID' = q9r.variables,
-    'colors' = c("#d4e6c0",
-          "#c0db9c",
-          "#a8d16b",
-          "#92c039",
-          "#92b64e",
-          "#71952c"),
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    ),
     'keyOrder' = rowNames
   )
   
@@ -2207,7 +2265,7 @@ Q15 <- function (curr.id, question.order, aided.order) {
       curr.variable <- paste(prefix, "c", c.values[cx], sep = "")
       curr.map.index <-
         grep(curr.variable, example.data.map.variables$label)
-      curr.map.entry <- example.data.map.variables[curr.map.index, ]
+      curr.map.entry <- example.data.map.variables[curr.map.index,]
       curr.response <- example.raw.data[curr.variable]
       curr.n.valid[rx, cx] <-
         sum(!is.na(curr.response), na.rm = TRUE)
@@ -2225,7 +2283,7 @@ Q15 <- function (curr.id, question.order, aided.order) {
   }
   
   brand.name.vector <- as.vector(brand.name)
-  curr.brand.sample.size <- as.data.frame(curr.n.valid[1,])
+  curr.brand.sample.size <- as.data.frame(curr.n.valid[1, ])
   colnames(curr.brand.sample.size) <- "Sample Size"
   rownames(curr.brand.sample.size) <- brand.name.vector
   
@@ -2236,15 +2294,15 @@ Q15 <- function (curr.id, question.order, aided.order) {
   
   sort.n.valid <- curr.n.valid[question.order, aided.order]
   sorted.n.response <- curr.n.response[question.order, aided.order]
-  sorted.pct.response.1 <- curr.pct.response[question.order,]
+  sorted.pct.response.1 <- curr.pct.response[question.order, ]
   sorted.pct.response <- sorted.pct.response.1[, aided.order]
-  sorted.brand.sample.size <- curr.brand.sample.size[aided.order,]
+  sorted.brand.sample.size <- curr.brand.sample.size[aided.order, ]
   
   # significance testing of each brand vs each other brand for each question
   # Pearson's Chi-Square
   
   significance <- sorted.pct.response
-  significance[, ] <- "" # clear the contents of significance
+  significance[,] <- "" # clear the contents of significance
   
   letters <- rawToChar(as.raw(65:(64 + n.brand)))
   
@@ -2287,8 +2345,9 @@ Q15 <- function (curr.id, question.order, aided.order) {
   
   combined <- cbind(sorted.pct.response, significance.to.combine)
   
-
-  transposedData <- sorted.pct.response #as.data.frame(t(as.matrix(sorted.pct.response)))
+  
+  transposedData <-
+    sorted.pct.response #as.data.frame(t(as.matrix(sorted.pct.response)))
   rowNames <- rownames(transposedData)
   result <- list(
     "curr.id" = curr.id,
@@ -2298,19 +2357,21 @@ Q15 <- function (curr.id, question.order, aided.order) {
     "pct.response" = combined,
     "brand.sample.size" = sorted.brand.sample.size,
     "significance" = significance,
-
-
+    
+    
     "orientation" = "h",
     'data' = transposedData,
     'baseSize' = sorted.brand.sample.size,
     'chartType' = 'table',
     'questionID' = curr.id,
-    'colors' = c("#d4e6c0",
-          "#c0db9c",
-          "#a8d16b",
-          "#92c039",
-          "#92b64e",
-          "#71952c"),
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    ),
     'keyOrder' = rowNames
   )
 }
@@ -2325,7 +2386,7 @@ Q5 <- function(curr.id, n.top, n.level) {
   
   data.map.index <-
     grep(curr.pattern, example.data.map.variables$label)
-  data.map.variable <- example.data.map.variables[data.map.index, ]
+  data.map.variable <- example.data.map.variables[data.map.index,]
   level.string <- data.map.variable$values[1][[1]]$title
   
   channel.title <- data.map.variable$rowTitle
@@ -2365,7 +2426,7 @@ Q5 <- function(curr.id, n.top, n.level) {
   curr.count <- Data.Level.Count(curr.data, n.level)
   
   curr.n.valid <- curr.count$n.valid
-  curr.n.response.2or3 <- curr.count$n.response[2:3, ]
+  curr.n.response.2or3 <- curr.count$n.response[2:3,]
   rownames(curr.n.response.2or3) <- level.string[2:3]
   curr.n.response.2and3 <-
     t(as.data.frame(colSums(curr.n.response.2or3)))
@@ -2398,14 +2459,14 @@ Q5 <- function(curr.id, n.top, n.level) {
   colnames(other.data.max) <- "All Other"
   other.n.valid <- sum(!is.na(other.data.max),  na.rm = TRUE)
   
-  other.n.response <- as.data.frame(other.data.max[0,])
+  other.n.response <- as.data.frame(other.data.max[0, ])
   for (ix in 1:n.level) {
-    other.n.response[ix,] <-
+    other.n.response[ix, ] <-
       apply(other.data.max, 2, function(x)
         sum(x == ix, na.rm = TRUE))
   }
   
-  other.n.response.2or3 <- other.n.response[2:3,]
+  other.n.response.2or3 <- other.n.response[2:3, ]
   other.response.report <-
     as.data.frame(c(other.n.response.2or3, sum(other.n.response.2or3)))
   colnames(other.response.report) <- "All Other"
@@ -2415,9 +2476,9 @@ Q5 <- function(curr.id, n.top, n.level) {
   report.n.valid <- sort.n.valid
   report.n.valid[n.top + 1] <- other.n.valid
   report.pct.response <- report.n.response / report.n.valid
-
   
-
+  
+  
   transposedData <- as.data.frame(t(as.matrix(report.pct.response)))
   rowNames <- names(transposedData)
   result <- list(
@@ -2426,12 +2487,14 @@ Q5 <- function(curr.id, n.top, n.level) {
     "data" = transposedData,
     "questionID" = curr.id,
     "orientation" = "v",
-    'colors' = c("#71952c",
-          "#92b64e",
-          "#92c039",
-          "#92c039",
-          "#92b64e",
-          "#71952c"),
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    ),
     'keyOrder' = rowNames
   )
 }
@@ -2495,7 +2558,8 @@ rollup.desc.Q12 <- c("Like a Lot",
 #source("Slides15 16 Q15 Brand Performance 20200628.R")
 
 Brand.Perceptual.Map <- function (q15.summary) {
-  q15.map <- ca(q15.summary$just.pct.response)	# Run correspondence analysis
+  q15.map <-
+    ca(q15.summary$just.pct.response)	# Run correspondence analysis
   
   attribute.coordinates <- q15.map$rowcoord
   brand.coordinates <- q15.map$colcoord
@@ -2644,7 +2708,7 @@ Fulfillment.Data <- function(id.fulfill, respondent.index) {
   variable.fulfill <- Variable.From.Question(id.fulfill)
   fulfill.data <- Data.Value(variable.fulfill$variable)
   fulfill.data.select <-
-    as.data.frame(fulfill.data[respondent.index,])
+    as.data.frame(fulfill.data[respondent.index, ])
   colnames(fulfill.data.select) <- "Fulfillment Type"
   
   level.values <-
@@ -2668,12 +2732,14 @@ Fulfillment.Data <- function(id.fulfill, respondent.index) {
     "data" = pct.response,
     "questionID" = id.fulfill,
     'chartType' = 'bar',
-    'colors' = c("#03045e",
-          "#023e8a",
-          "#0077b6",
-          "#0096c7",
-          "#00b4d8",
-          "#48cae4"),
+    'colors' = c(
+      "#03045e",
+      "#023e8a",
+      "#0077b6",
+      "#0096c7",
+      "#00b4d8",
+      "#48cae4"
+    ),
     'keyOrder' = level.string
   )
 }
@@ -2692,10 +2758,10 @@ Horizontal.Bar.Chart.Subset <-
     
     prep.map <- location.map[[prep.string]]
     
-    select.data <- all.data[prep.map$index, ]
+    select.data <- all.data[prep.map$index,]
     
     select.count <- Data.Level.Count(select.data, 1)
-  
+    
     order.pct.response <-
       order(select.count$pct.response, decreasing = TRUE)
     
@@ -2716,13 +2782,13 @@ Horizontal.Bar.Chart.Subset <-
       select.count$pct.response[order.positive.pct.response]
     sort.n.valid <-
       select.count$n.valid[order.positive.pct.response]
-
+    
     keyOrder <- colnames(sort.pct.response)
     data <- sort.pct.response
     transposedData <- as.data.frame(t(as.matrix(data)))
     colnames(transposedData) <- c('value')
     
-    percentage <- round((prep.map$n / n.location) *100, digits=0)
+    percentage <- round((prep.map$n / n.location) * 100, digits = 0)
     supplement <- list("prep" = prep.string,
                        "pct.prep" = prep.map$n / n.location)
     
@@ -2731,7 +2797,7 @@ Horizontal.Bar.Chart.Subset <-
       "pct.response" = sort.pct.response,
       "curr.id" = c("Q21", "Q22"),
       "orientation" = "h",
-      "title" = paste(prep.string ,' ', percentage, '%', sep=''),
+      "title" = paste(prep.string , ' ', percentage, '%', sep = ''),
       "supplement" = supplement,
       'data' = transposedData,
       'keyOrder' = keyOrder,
@@ -2739,12 +2805,14 @@ Horizontal.Bar.Chart.Subset <-
       'chartType' = 'bar',
       'questionID' = c("Q21", "Q22"),
       'orientation' = "h",
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+      'colors' = c(
+        "#71952c",
+        "#92b64e",
+        "#92c039",
+        "#92c039",
+        "#92b64e",
+        "#71952c"
+      )
     )
   }
 
@@ -2772,10 +2840,11 @@ Purchase.Prep <-
                                   location.map,
                                   all.data,
                                   n.location)
-
-    totalResponding <- planned[['baseSize']][1] + spontaneous[['baseSize']][[1]]
-
-    ## don't knwo how to calculate the %ages for planned vs sponteneous 
+    
+    totalResponding <-
+      planned[['baseSize']][1] + spontaneous[['baseSize']][[1]]
+    
+    ## don't knwo how to calculate the %ages for planned vs sponteneous
     ## plannedPercent <- round(planned[['baseSize']][1]/totalResponding, digits=2)
     ## print(paste('plannedPercent', plannedPercent, 'totalResponding', totalResponding, ' planned basesize 1', planned[['baseSize']][1]))
     
@@ -2827,18 +2896,22 @@ Q16.Single.Column.With.Significance <-
     curr.data <- Data.Value(curr.id)
     
     curr.count <-
-      Data.Labeled.Level.Count(curr.data, id.data$`level description`$title,
-                               sort = TRUE, decrease = FALSE)
+      Data.Labeled.Level.Count(
+        curr.data,
+        id.data$`level description`$title,
+        sort = TRUE,
+        decrease = FALSE
+      )
     
     significance <-
       Multinomial.Significance.Test(curr.count$n.response, p.value)
     
-
-    name <-colnames(curr.count$pct.response)
+    
+    name <- colnames(curr.count$pct.response)
     data <- curr.count$pct.response
     keyOrder <- rownames(data)
     colnames(data) <- c('value')
-
+    
     result <- list(
       "n.valid" = curr.count$n.valid,
       "pct.response" = curr.count$pct.response,
@@ -2851,12 +2924,14 @@ Q16.Single.Column.With.Significance <-
       'baseSize' = curr.count$n.valid,
       'questionID' = curr.id,
       'orientation' = "h",
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+      'colors' = c(
+        "#71952c",
+        "#92b64e",
+        "#92c039",
+        "#92c039",
+        "#92b64e",
+        "#71952c"
+      )
     )
   }
 ##############################################################
@@ -2878,7 +2953,7 @@ Q17.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -2887,20 +2962,20 @@ Q17.Single.Column <- function(curr.id, n.level, report.level) {
   
   # # # hard-coded labels:
   keyOrder <- c(
-      "Stock Up",
-      "Running Low / Fill In",
-      "Same Day Use",
-      "Special Occ",
-      "Store browsing",
-      "Sale visit",
-      "Had coupon"
-    )
+    "Stock Up",
+    "Running Low / Fill In",
+    "Same Day Use",
+    "Special Occ",
+    "Store browsing",
+    "Sale visit",
+    "Had coupon"
+  )
   names(pct.level) <- keyOrder
-
+  
   
   pct.level.order <- order(pct.level, decreasing = FALSE)
   pct.level.sorted <- pct.level[pct.level.order]
-
+  
   data <- as.data.frame(pct.level.sorted[report.level])
   colnames(data) <- c('value')
   keyOrder <- rownames(data)
@@ -2911,17 +2986,19 @@ Q17.Single.Column <- function(curr.id, n.level, report.level) {
     "title" = "Shopping Trip Type",
     "orientation" = "h",
     "curr.id" = curr.id,
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'questionID' = curr.id,
-      'orientation' = "h",
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'questionID' = curr.id,
+    'orientation' = "h",
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -2954,7 +3031,7 @@ Sort.Single.Column <- function(raw) {
   
   sort.index <- order(raw, "decreasing" = TRUE)
   
-  sorted <- as.data.frame(raw[sort.index, ])
+  sorted <- as.data.frame(raw[sort.index,])
   rownames(sorted) <- row.name[sort.index]
   colnames(sorted) <- column.name
   
@@ -2978,7 +3055,7 @@ Sort.Single.Column.Exclude.Other <- function (raw) {
   
   raw.row.name <- row.names(raw)
   
-  sort.excluded <- as.data.frame(raw[sort.index,])
+  sort.excluded <- as.data.frame(raw[sort.index, ])
   rownames(sort.excluded) <- raw.row.name[sort.index]
   colnames(sort.excluded) <- column.name
   
@@ -2996,13 +3073,13 @@ Single.Column.Rollup <-
     n.level <- all.data$n
     n.rollup.level = length(level.rollup)
     
-    rollup <- as.data.frame(sorted.data[0, ])
+    rollup <- as.data.frame(sorted.data[0,])
     rollup.row.names <- NULL
     
     for (ix in 1:n.rollup.level) {
       ix.rollup <- unlist(level.rollup[ix])
       
-      rollup[ix, ] = sum(sorted.data[ix.rollup, ])
+      rollup[ix,] = sum(sorted.data[ix.rollup,])
       
       if (ix == n.rollup.level) {
         rollup.row.names[ix] <- other.label
@@ -3048,23 +3125,25 @@ Top.Purchase.Channels <- function(source.data, n.top) {
   keyOrder <- rownames(chart.data)
   colnames(data) <- c('value')
   
-
+  
   result <- list(
     "n.valid" = source.data$n.respondent,
     "pct.response" = as.data.frame(chart.data),
     "title" = "Top Purchase Channels",
     "curr.id" = c("Q18", "Q19"),
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = source.data$n.respondent,
-      'questionID' = c("Q18", "Q19"),
-      'orientation' = "v",
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = source.data$n.respondent,
+    'questionID' = c("Q18", "Q19"),
+    'orientation' = "v",
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3096,19 +3175,19 @@ Trip.Type <- function() {
   
   # allocate a data.frame with named columns
   Q24r.n.purchase.frequency.level <-
-    as.data.frame(Q24r.numeric.frame[0,], row.names = NULL)
+    as.data.frame(Q24r.numeric.frame[0, ], row.names = NULL)
   Q24r.pct.purchase.frequency.level <-
-    as.data.frame(Q24r.numeric.frame[0,], row.names = NULL)
+    as.data.frame(Q24r.numeric.frame[0, ], row.names = NULL)
   
   # Q24r.n.purchase.frequency.level <- data.frame(Q24r.numeric.frame[,])
   
   for (ix in 1:1) {
-    Q24r.n.purchase.frequency.level[ix,] <-
+    Q24r.n.purchase.frequency.level[ix, ] <-
       apply(Q24r.numeric.frame, 2, function(x)
         sum(x == ix, na.rm = TRUE))
     
-    Q24r.pct.purchase.frequency.level[ix,] <-
-      Q24r.n.purchase.frequency.level[ix,] / Q24r.n.valid
+    Q24r.pct.purchase.frequency.level[ix, ] <-
+      Q24r.n.purchase.frequency.level[ix, ] / Q24r.n.valid
   }
   
   ### label
@@ -3116,9 +3195,10 @@ Trip.Type <- function() {
   keyOrder <-
     c("Regular", "On Sale", "Coupon")
   #print(paste(typeof(unlist(Q24r.pct.purchase.frequency.level, use.names=FALSE)), ' and keyOrder', typeof(keyOrder)))
-  dataAsList <- unlist(Q24r.pct.purchase.frequency.level, use.names=FALSE)
-  data <- data.frame('value'=dataAsList, 'attribute'=keyOrder)
- # keyOrder <- rownames(data)
+  dataAsList <-
+    unlist(Q24r.pct.purchase.frequency.level, use.names = FALSE)
+  data <- data.frame('value' = dataAsList, 'attribute' = keyOrder)
+  # keyOrder <- rownames(data)
   
   result <- list(
     "pct.response" = Q24r.pct.purchase.frequency.level,
@@ -3127,16 +3207,18 @@ Trip.Type <- function() {
     "curr.id" = "Q24",
     "orientation" = "h",
     'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = Q24r.n.valid,
-      'chartType' = 'bar',
-      'questionID' = "Q24",
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    'keyOrder' = keyOrder,
+    'baseSize' = Q24r.n.valid,
+    'chartType' = 'bar',
+    'questionID' = "Q24",
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
   
 }
@@ -3160,7 +3242,7 @@ Q23.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -3168,14 +3250,15 @@ Q23.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-
+  
   keyOrder <-
     c("Go Elsewhere for Brand",
       "Buy Another Brand",
       "Purchase Nothing in Category")
- # names(pct.level) <- keyOrder
+  # names(pct.level) <- keyOrder
   #print(paste(typeof(pct.level[report.level]), ' the type'))
-  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder)#as.data.frame('value'=pct.level[report.level], 'attribute'=keyOrder)
+  data <-
+    data.frame('value' = pct.level[report.level], 'attribute' = keyOrder)#as.data.frame('value'=pct.level[report.level], 'attribute'=keyOrder)
   
   
   result <- list(
@@ -3184,17 +3267,19 @@ Q23.Single.Column <- function(curr.id, n.level, report.level) {
     "title" = "Substitutability",
     "curr.id" = curr.id,
     "chartType" = "pie",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'chartType' = 'bar',
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'chartType' = 'bar',
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3215,7 +3300,7 @@ Q26.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -3223,22 +3308,22 @@ Q26.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-
+  
   keyOrder <-  c(
-      "Everyday",
-      "Regular Occasion / Little Special",
-      "Special Family Occasion",
-      "Party / Entertaining",
-      "Other"
-    )
-
+    "Everyday",
+    "Regular Occasion / Little Special",
+    "Special Family Occasion",
+    "Party / Entertaining",
+    "Other"
+  )
+  
   # names(pct.level) <- keyOrder
-   
+  
   data <- as.data.frame(pct.level)
   rownames(data) <- keyOrder
   transposedData <- as.data.frame(t(as.matrix(data)))
   rowNames <- names(transposedData)
-
+  
   
   result <- list(
     "n.valid" = n.valid,
@@ -3247,17 +3332,19 @@ Q26.Single.Column <- function(curr.id, n.level, report.level) {
     "title" = "Occasion Type",
     "chart.type" = "stacked bar",
     "chartType" = "stackedBar",
-      'data' = transposedData,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'chartType' = 'bar',
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    'data' = transposedData,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'chartType' = 'bar',
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3292,49 +3379,55 @@ Intended.User <- function() {
   
   # allocate a data.frame with named columns
   Q25r.n.purchase.frequency.level <-
-    as.data.frame(Q25r.numeric.frame[0,], row.names = NULL)
+    as.data.frame(Q25r.numeric.frame[0, ], row.names = NULL)
   Q25r.pct.purchase.frequency.level <-
-    as.data.frame(Q25r.numeric.frame[0,], row.names = NULL)
+    as.data.frame(Q25r.numeric.frame[0, ], row.names = NULL)
   
   # Q25r.n.purchase.frequency.level <- data.frame(Q25r.numeric.frame[,])
   
   for (ix in 1:1) {
-    Q25r.n.purchase.frequency.level[ix,] <-
+    Q25r.n.purchase.frequency.level[ix, ] <-
       apply(Q25r.numeric.frame, 2, function(x)
         sum(x == ix, na.rm = TRUE))
     
-    Q25r.pct.purchase.frequency.level[ix,] <-
-      Q25r.n.purchase.frequency.level[ix,] / Q25r.n.valid
+    Q25r.pct.purchase.frequency.level[ix, ] <-
+      Q25r.n.purchase.frequency.level[ix, ] / Q25r.n.valid
     
     
     # hard-coded labels:
     keyOrder <- c("Self",
-        "Spouse / SO",
-        "Other Adult",
-        "Kids 0 - 12",
-        "Kids 13 - 17")
+                  "Spouse / SO",
+                  "Other Adult",
+                  "Kids 0 - 12",
+                  "Kids 13 - 17")
     names(Q25r.pct.purchase.frequency.level) <- keyOrder
-      
+    
   }
-
-  dataAsList <- unlist(Q25r.pct.purchase.frequency.level,use.names=FALSE)
+  
+  dataAsList <-
+    unlist(Q25r.pct.purchase.frequency.level, use.names = FALSE)
   result <- list(
     "pct.response" = Q25r.pct.purchase.frequency.level,
     "title" = "Intended User",
     "n.valid" = Q25r.n.valid,
     "curr.id" = "Q25",
     "orientation" = "h",
-      "chartType" = "bar",
-      'data' = data.frame('value'=rev(dataAsList), 'attribute'=rev(keyOrder)),
-      'keyOrder' = rev(keyOrder),
-      'baseSize' = Q25r.n.valid,
-      'questionID' = "Q25",
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "chartType" = "bar",
+    'data' = data.frame(
+      'value' = rev(dataAsList),
+      'attribute' = rev(keyOrder)
+    ),
+    'keyOrder' = rev(keyOrder),
+    'baseSize' = Q25r.n.valid,
+    'questionID' = "Q25",
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
   
   
@@ -3369,7 +3462,7 @@ Q29.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -3377,20 +3470,21 @@ Q29.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-
+  
   keyOrder <-  c(
-      "Pre - Bkfst",
-      "Bkfst",
-      "Bkfst - Lunch",
-      "Lunch",
-      "Lunch - Dinner",
-      "Dinner",
-      "After Dinner"
-    )
-
- # names(pct.level) <- keyOrder
-
-  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
+    "Pre - Bkfst",
+    "Bkfst",
+    "Bkfst - Lunch",
+    "Lunch",
+    "Lunch - Dinner",
+    "Dinner",
+    "After Dinner"
+  )
+  
+  # names(pct.level) <- keyOrder
+  
+  data <-
+    data.frame('value' = pct.level[report.level], 'attribute' = keyOrder)
   
   result <- list(
     "n.valid" = n.valid,
@@ -3398,17 +3492,19 @@ Q29.Single.Column <- function(curr.id, n.level, report.level) {
     "curr.id" = curr.id,
     "title" = 'Meal Type',
     "orientation" = "h",
-      "chartType" = "bar",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "chartType" = "bar",
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3426,7 +3522,7 @@ Q32.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -3435,28 +3531,31 @@ Q32.Single.Column <- function(curr.id, n.level, report.level) {
   
   # hard-coded labels:
   keyOrder <- c("On Its Own",
-      "In a Recipe",
-      "w Meal / Snack")
-
-  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
+                "In a Recipe",
+                "w Meal / Snack")
+  
+  data <-
+    data.frame('value' = pct.level[report.level], 'attribute' = keyOrder)
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level[report.level]),
     "curr.id" = curr.id,
     "title" = 'Usage Level',
-     "orientation" = "h",
-      "chartType" = "bar",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "orientation" = "h",
+    "chartType" = "bar",
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3475,7 +3574,7 @@ Q33.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -3490,7 +3589,8 @@ Q33.Single.Column <- function(curr.id, n.level, report.level) {
       "Party",
       "Other")
   
-  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
+  data <-
+    data.frame('value' = pct.level[report.level], 'attribute' = keyOrder)
   
   result <- list(
     "n.valid" = n.valid,
@@ -3498,17 +3598,19 @@ Q33.Single.Column <- function(curr.id, n.level, report.level) {
     "curr.id" = curr.id,
     "orientation" = "h",
     "title" = 'Occasion Type',
-      "chartType" = "bar",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "chartType" = "bar",
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3526,7 +3628,7 @@ Q28.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -3539,14 +3641,15 @@ Q28.Single.Column <- function(curr.id, n.level, report.level) {
   
   # hard-coded labels:
   keyOrder <- c("M",
-      "T",
-      "W",
-      "TH",
-      "F",
-      "SA",
-      "SU")
+                "T",
+                "W",
+                "TH",
+                "F",
+                "SA",
+                "SU")
   
-  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
+  data <-
+    data.frame('value' = pct.level[report.level], 'attribute' = keyOrder)
   
   
   result <- list(
@@ -3555,17 +3658,19 @@ Q28.Single.Column <- function(curr.id, n.level, report.level) {
     "curr.id" = curr.id,
     "orientation" = "h",
     "title" = 'Day of Week',
-      "chartType" = "bar",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "chartType" = "bar",
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3584,7 +3689,7 @@ Q30.Single.Column <- function(curr.id, n.level, report.level) {
   
   ix.valid <- which(!is.na(curr.data))
   n.valid <- length(ix.valid)
-  valid.data <- curr.data[ix.valid,]
+  valid.data <- curr.data[ix.valid, ]
   
   # count the number of responses for each variable
   pct.level <-
@@ -3604,7 +3709,8 @@ Q30.Single.Column <- function(curr.id, n.level, report.level) {
   keyOrder <- keyOrder[pct.level.order]
   
   #names(pct.level.sorted) <- names.Q30.sorted
-  data <- data.frame('value'=pct.level.sorted[report.level],'attribute'=keyOrder) 
+  data <-
+    data.frame('value' = pct.level.sorted[report.level], 'attribute' = keyOrder)
   
   result <- list(
     "n.valid" = n.valid,
@@ -3612,17 +3718,19 @@ Q30.Single.Column <- function(curr.id, n.level, report.level) {
     "curr.id" = curr.id,
     "orientation" = "h",
     "title" = 'Location',
-      "chartType" = "bar",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = n.valid,
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "chartType" = "bar",
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = n.valid,
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3659,7 +3767,9 @@ Q31.new <- function(curr.id) {
       "Kids 13-17",
       "Someone Else")
   
-  data <- data.frame('value'=unlist(curr.pct.response, use.names=FALSE),'attribute'=keyOrder) 
+  data <-
+    data.frame('value' = unlist(curr.pct.response, use.names = FALSE),
+               'attribute' = keyOrder)
   #sort.pct.response <- sort(curr.pct.response, 'decreasing' = TRUE)
   
   result <- list(
@@ -3669,17 +3779,19 @@ Q31.new <- function(curr.id) {
     "curr.id" = curr.id,
     "pct.response" = curr.pct.response,
     "orientation" = "h",
-      "chartType" = "bar",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = curr.n.valid,
-      'questionID' = label.and.data$data.map$qtitle[1],
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "chartType" = "bar",
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = curr.n.valid,
+    'questionID' = label.and.data$data.map$qtitle[1],
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -3708,7 +3820,9 @@ Q35 <- function(curr.id) {
   
   data <- rev(sort.pct.response[1:3])
   keyOrder <- rev(colnames(data))
-  data <- data.frame('value'=unlist(data,use.names=FALSE), 'attribute'=keyOrder)
+  data <-
+    data.frame('value' = unlist(data, use.names = FALSE),
+               'attribute' = keyOrder)
   result <- list(
     "title" = "Reasons",
     "n.valid" = curr.n.valid,
@@ -3716,17 +3830,19 @@ Q35 <- function(curr.id) {
     "pct.response" = sort.pct.response[1:3],
     "orientation" = "h",
     "curr.id" = curr.id,
-      "chartType" = "bar",
-      'data' = data,
-      'keyOrder' = keyOrder,
-      'baseSize' = curr.n.valid,
-      'questionID' = curr.id,
-      'colors' = c("#71952c",
-            "#92b64e",
-            "#92c039",
-            "#92c039",
-            "#92b64e",
-            "#71952c")
+    "chartType" = "bar",
+    'data' = data,
+    'keyOrder' = keyOrder,
+    'baseSize' = curr.n.valid,
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
   
 }
@@ -3760,14 +3876,27 @@ Q34.new <- function(curr.id) {
   # colnames(curr.pct.response) <- data.map.variable$rowTitle
   
   sort.pct.response <- sort(curr.pct.response, 'decreasing' = TRUE)
-  
+  keyOrder <- rev(rownames(sort.pct.response))
   result <- list(
     "title" = "Reason For Choosing Brand",
     "n.valid" = curr.n.valid,
     'question' = label.and.data$data.map$qtitle[1],
     "pct.response" = sort.pct.response,
     "orientation" = "h",
-    "curr.id" = curr.id
+    "curr.id" = curr.id,
+    "chartType" = "bar",
+    'data' = rev(sort.pct.response),
+    'keyOrder' = keyOrder,
+    'baseSize' = curr.n.valid,
+    'questionID' = curr.id,
+    'colors' = c(
+      "#71952c",
+      "#92b64e",
+      "#92c039",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -4015,249 +4144,217 @@ out.slide25.Q34.reasonchoosebrand.HB <-
 
 
 ###JSON FORMATTING EXAMPLE START ###
-genderFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c1.S3.gender.PC
-)
+genderFormatted <- returnChartDataAndMetaData(out.slide4.r1c1.S3.gender.PC)
 
-regionFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c2.region_quota.MAP
-)
+regionFormatted <- returnChartDataAndMetaData(out.slide4.r1c2.region_quota.MAP)
 
-inComeFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c3.D3.income.VSB
-)
+inComeFormatted <- returnChartDataAndMetaData(out.slide4.r1c3.D3.income.VSB)
 
-ethnicityFormatted <- returnChartDataAndMetaData(
-  out.slide4.r1c4.S5S6.ethnicity.VSB
-)
+ethnicityFormatted <- returnChartDataAndMetaData(out.slide4.r1c4.S5S6.ethnicity.VSB)
 
-householdSizeFormatted <- addTableDataKey(
-  out.slide4.r2c1.D1.HHSize.UK,
-  'Household Size'
-)
+householdSizeFormatted <- addTableDataKey(out.slide4.r2c1.D1.HHSize.UK,
+                                          'Household Size')
 
-householdCompositionFormatted <- returnChartDataAndMetaData(
-  out.slide4.r2c2.HHCompr.HHComp.HB)
+householdCompositionFormatted <- returnChartDataAndMetaData(out.slide4.r2c2.HHCompr.HHComp.HB)
 
-generationFormatted <- returnChartDataAndMetaData(
-  out.slide4.r2c3.S4.generations.VSB
-)
+generationFormatted <- returnChartDataAndMetaData(out.slide4.r2c3.S4.generations.VSB)
 
 
-urbanicityFormatted <- returnChartDataAndMetaData(
-  out.slide4.r2c4.D4.urbanicity.VSB)
+urbanicityFormatted <- returnChartDataAndMetaData(out.slide4.r2c4.D4.urbanicity.VSB)
 
-sustainabilityFormatted <- returnChartDataAndMetaData(
-  out.slide5.Q37.sustainability.VSB
-)
+sustainabilityFormatted <- returnChartDataAndMetaData(out.slide5.Q37.sustainability.VSB)
 
-purchaseRecencyFormatted <- returnChartDataAndMetaData(
-  out.slide6.c1.Q1.catpurchrec.HB
-)
+purchaseRecencyFormatted <- returnChartDataAndMetaData(out.slide6.c1.Q1.catpurchrec.HB)
 
-purchaseFrequncyFormatted <- returnChartDataAndMetaData(
-  out.slide6.c2.Q3.catpurchfreq.HB
-)
+purchaseFrequncyFormatted <- returnChartDataAndMetaData(out.slide6.c2.Q3.catpurchfreq.HB)
 
-whereTheyShopFormatted <- returnChartDataAndMetaData(
-  out.slide8.Q5.wheretheyshop.VSB
-)
+whereTheyShopFormatted <- returnChartDataAndMetaData(out.slide8.Q5.wheretheyshop.VSB)
 
-whatsImportantFormatted <- returnChartDataAndMetaData(
-  out.slide9.Q6.importance.VSB
-)
+whatsImportantFormatted <- returnChartDataAndMetaData(out.slide9.Q6.importance.VSB)
 
-aidedAwarenessFormatted <- returnChartDataAndMetaData(
-  out.slide10.c2.Q8.aidaware.VB
-)
+aidedAwarenessFormatted <- returnChartDataAndMetaData(out.slide10.c2.Q8.aidaware.VB)
 
 
 ## need to transpose the data and add the keyOrder
-transformedDataAndKeyOrderAdded <- out.slide12.c1.slide13.c1.Q10.brandpurchrec.hsb
-transformedDataAndKeyOrderAdded[['data']] <- as.data.frame(t(as.matrix(transformedDataAndKeyOrderAdded[['data']] )))
-transformedDataAndKeyOrderAdded[['keyOrder']]  <- colnames(transformedDataAndKeyOrderAdded[['data']] ) 
+transformedDataAndKeyOrderAdded <-
+  out.slide12.c1.slide13.c1.Q10.brandpurchrec.hsb
+transformedDataAndKeyOrderAdded[['data']] <-
+  as.data.frame(t(as.matrix(transformedDataAndKeyOrderAdded[['data']])))
+transformedDataAndKeyOrderAdded[['keyOrder']]  <-
+  colnames(transformedDataAndKeyOrderAdded[['data']])
 
 
-recencyOfBrandsFormatted <- returnChartDataAndMetaData(
-  transformedDataAndKeyOrderAdded
-)
+recencyOfBrandsFormatted <- returnChartDataAndMetaData(transformedDataAndKeyOrderAdded)
 
 
 ### need to use the row labels as the key value plus add an empty attribute
-satisfactionBrandAvailableFormatted = returnChartDataAndMetaData(
-  out.slide12.c2.slide13.c1.Q14.satisbrandavail.vsb
-)
+satisfactionBrandAvailableFormatted = returnChartDataAndMetaData(out.slide12.c2.slide13.c1.Q14.satisbrandavail.vsb)
 
 
 
 
 ## need to transpose the data and add the keyOrder
-transformedDataAndKeyOrderAddedQ11 <- out.slide13.c2.Q11.recencyofbrand.hsb
-transformedDataAndKeyOrderAddedQ11[['data']] <- as.data.frame(t(as.matrix(transformedDataAndKeyOrderAddedQ11[['data']] )))
-transformedDataAndKeyOrderAddedQ11[['keyOrder']]  <- colnames(transformedDataAndKeyOrderAddedQ11[['data']] ) 
+transformedDataAndKeyOrderAddedQ11 <-
+  out.slide13.c2.Q11.recencyofbrand.hsb
+transformedDataAndKeyOrderAddedQ11[['data']] <-
+  as.data.frame(t(as.matrix(transformedDataAndKeyOrderAddedQ11[['data']])))
+transformedDataAndKeyOrderAddedQ11[['keyOrder']]  <-
+  colnames(transformedDataAndKeyOrderAddedQ11[['data']])
 
 
-recencyBrandUsageFormatted <- returnChartDataAndMetaData(
-  transformedDataAndKeyOrderAddedQ11
-)
+recencyBrandUsageFormatted <- returnChartDataAndMetaData(transformedDataAndKeyOrderAddedQ11)
 
 
 
 
 ## need to transpose the data and add the keyOrder
 transformBrandAffinity <- out.slide14.c1.q12.brandaffinity.HSB
-transformBrandAffinity[['data']] <- as.data.frame(t(as.matrix(transformBrandAffinity[['data']] )))
-transformBrandAffinity[['keyOrder']]  <- colnames(transformBrandAffinity[['data']] ) 
+transformBrandAffinity[['data']] <-
+  as.data.frame(t(as.matrix(transformBrandAffinity[['data']])))
+transformBrandAffinity[['keyOrder']]  <-
+  colnames(transformBrandAffinity[['data']])
 
 
-brandAffinityFormatted <- returnChartDataAndMetaData(
-  transformBrandAffinity
-)
+brandAffinityFormatted <- returnChartDataAndMetaData(transformBrandAffinity)
 
 
-likelihoodToRecommendBrand <- out.slide14.c2.q13.brandreclikelihood.HSB
-likelihoodToRecommendBrand[['data']] <- as.data.frame(t(as.matrix(likelihoodToRecommendBrand[['data']] )))
+likelihoodToRecommendBrand <-
+  out.slide14.c2.q13.brandreclikelihood.HSB
+likelihoodToRecommendBrand[['data']] <-
+  as.data.frame(t(as.matrix(likelihoodToRecommendBrand[['data']])))
 ## rename cols according to ppt example
-notToExtreme <- c('Not at all', 'Not very', 'Somewhat', 'Very', 'Extremely')
+notToExtreme <-
+  c('Not at all', 'Not very', 'Somewhat', 'Very', 'Extremely')
 colnames(likelihoodToRecommendBrand[['data']]) <- notToExtreme
-likelihoodToRecommendBrand[['keyOrder']]  <- colnames(likelihoodToRecommendBrand[['data']] ) 
+likelihoodToRecommendBrand[['keyOrder']]  <-
+  colnames(likelihoodToRecommendBrand[['data']])
 
-likelihoodToRecommendBrandFormatted <- returnChartDataAndMetaData(
-  likelihoodToRecommendBrand
-)
-
+likelihoodToRecommendBrandFormatted <- returnChartDataAndMetaData(likelihoodToRecommendBrand)
 
 
-brandTopFeaturesFormatted <- returnChartDataAndMetaData(
-  out.slide1516.Q15.brandperf.UK
-)
+
+brandTopFeaturesFormatted <- returnChartDataAndMetaData(out.slide1516.Q15.brandperf.UK)
 
 
-convertToGridTableFormat <- function(obj){
+convertToGridTableFormat <- function(obj) {
   data <- obj[['data']]
   baseSize <- obj[['baseSize']]
   tableData <- list()
   colNames <- colnames(data)
   rowNames <- rownames(data)
-
-  for (e in 1:length(colNames)){
+  
+  for (e in 1:length(colNames)) {
     tableData[[e]] <- list(
       'baseSize' = baseSize[e],
-      'qtitle'='',
-      'type'='single',
-      'rowTitle'= colNames[[e]],
-      'isGrid'= TRUE
+      'qtitle' = '',
+      'type' = 'single',
+      'rowTitle' = colNames[[e]],
+      'isGrid' = TRUE
     )
-    tableData[[e]][['data']]<- list(
-      'percent100' = list()
-    )
+    tableData[[e]][['data']] <- list('percent100' = list())
     percent100 <- list()
     for (i in 1:length(rowNames)) {
-      rowName <-rowNames[i]
+      rowName <- rowNames[i]
       # only way I could work out how to map keys list to  a data list
       tempList <- list()
-      tempList[rowName] = data[i,paste(colNames[e])]
-      percent100[[i]]= tempList #list
+      tempList[rowName] = data[i, paste(colNames[e])]
+      percent100[[i]] = tempList #list
     }
     tableData[[e]][['data']][['percent100']] = percent100
   }
   result <- tableData
 }
 
-brandTopFeaturesFormatted[['tableData']] <- convertToGridTableFormat(out.slide1516.Q15.brandperf.UK)
+brandTopFeaturesFormatted[['tableData']] <-
+  convertToGridTableFormat(out.slide1516.Q15.brandperf.UK)
 
 
 
-lastBrandPurchaseFormatted <- returnChartDataAndMetaData(
-  out.slide21.r1c1.Q16.lastbrandpurch.HB
-)
+lastBrandPurchaseFormatted <- returnChartDataAndMetaData(out.slide21.r1c1.Q16.lastbrandpurch.HB)
 
 
-shoppintTripTypeFormatted <- returnChartDataAndMetaData(
-  out.slide21.r1c2.Q17.triptype.HB
-)
+shoppintTripTypeFormatted <- returnChartDataAndMetaData(out.slide21.r1c2.Q17.triptype.HB)
 
-topPurchaseChannelsFormatted <- returnChartDataAndMetaData(
-  out.slide21.r1c3.Q19Q18.channels.VB
-)
+topPurchaseChannelsFormatted <- returnChartDataAndMetaData(out.slide21.r1c3.Q19Q18.channels.VB)
 
 
-pricePaidFormatted <- returnChartDataAndMetaData(
-  out.slide21.r2c1.Q24.pricepaid.VB
-)
+pricePaidFormatted <- returnChartDataAndMetaData(out.slide21.r2c1.Q24.pricepaid.VB)
 
 
-substitutabilityFormatted <- returnChartDataAndMetaData(
-  out.slide21.r2c2.Q23.subst.PC
-)
+substitutabilityFormatted <- returnChartDataAndMetaData(out.slide21.r2c2.Q23.subst.PC)
 
 
-typeOfOccasionFormatted <- returnChartDataAndMetaData(
-  out.slide21.r2c3.Q26.occtype.VSB
-)
+typeOfOccasionFormatted <- returnChartDataAndMetaData(out.slide21.r2c3.Q26.occtype.VSB)
 
-intendedUserForamtted <- returnChartDataAndMetaData(
-  out.slide21.r2c4.Q25.user.HB
-)
+intendedUserForamtted <- returnChartDataAndMetaData(out.slide21.r2c4.Q25.user.HB)
 
 
-plannedFormatted <-returnChartDataAndMetaData(
-  out.slide22.Q21.22.lastpurchphys$planned
-)
+plannedFormatted <- returnChartDataAndMetaData(out.slide22.Q21.22.lastpurchphys$planned)
 
-spontaneousFormatted <-returnChartDataAndMetaData(
-  out.slide22.Q21.22.lastpurchphys$spontaneous
-)
+spontaneousFormatted <- returnChartDataAndMetaData(out.slide22.Q21.22.lastpurchphys$spontaneous)
 
 
-fulfillmentFormatted <- returnChartDataAndMetaData(
-  out.slide23.Q20to22.lastpurchonline$fulfillment
-)
+fulfillmentFormatted <- returnChartDataAndMetaData(out.slide23.Q20to22.lastpurchonline$fulfillment)
 
 
-onlinePlannedFormatted <- returnChartDataAndMetaData(
-  out.slide23.Q20to22.lastpurchonline$planned
-)
+onlinePlannedFormatted <- returnChartDataAndMetaData(out.slide23.Q20to22.lastpurchonline$planned)
 
-onlineSpontaneousFormatted <- returnChartDataAndMetaData(
-  out.slide23.Q20to22.lastpurchonline$spontaneous
-)
+onlineSpontaneousFormatted <- returnChartDataAndMetaData(out.slide23.Q20to22.lastpurchonline$spontaneous)
 
 
-lastBrandConsumedFormatted <- returnChartDataAndMetaData (
-  out.slide24.r1c1.q27.lastbrandcons.HB
-)
+lastBrandConsumedFormatted <- returnChartDataAndMetaData (out.slide24.r1c1.q27.lastbrandcons.HB)
 
 
-mealTypeFormatted <- returnChartDataAndMetaData(
-  out.slide24.r1c2.Q29.mealtype.HB
-)
+mealTypeFormatted <- returnChartDataAndMetaData(out.slide24.r1c2.Q29.mealtype.HB)
 
-usageTypeFormatted <- returnChartDataAndMetaData(
-  out.slide24.r1c3.Q32.usagetype.HB
-)
+usageTypeFormatted <- returnChartDataAndMetaData(out.slide24.r1c3.Q32.usagetype.HB)
 
 
-ocassionTypeFormatted <- returnChartDataAndMetaData(
-  out.slide24.r1c4.Q33.occtype.HB
-)
+ocassionTypeFormatted <- returnChartDataAndMetaData(out.slide24.r1c4.Q33.occtype.HB)
 
 
-dayOfWeekFormatted <- returnChartDataAndMetaData(
-  out.slide24.r2c1.Q28.dayofweek.HB
-)
+dayOfWeekFormatted <- returnChartDataAndMetaData(out.slide24.r2c1.Q28.dayofweek.HB)
 
-locationFormatted <- returnChartDataAndMetaData(
-  out.slide24.r2c2.Q30.location.HB
-)
+locationFormatted <- returnChartDataAndMetaData(out.slide24.r2c2.Q30.location.HB)
 
-consumedWithFormatted <- returnChartDataAndMetaData(
-  out.slide24.r2c3.Q31.whowith.HB
-)
+consumedWithFormatted <- returnChartDataAndMetaData(out.slide24.r2c3.Q31.whowith.HB)
 
-whatsMostImportantFormatted <- returnChartDataAndMetaData(
-  out.slide24.r2c4.Q35.reasons.HB
-)
+whatsMostImportantFormatted <- returnChartDataAndMetaData(out.slide24.r2c4.Q35.reasons.HB)
+
+## split data frame in half after reversing
+
+splitInHalfAfterRow <- function(obj, splitAfter = 9) {
+  theData <- obj[['data']]
+  atPos1 <- obj
+  atPos2 <- obj
+  
+  totalNbrRows <- nrow(theData)
+  startAfterSplit <- (splitAfter + 1)
+  
+  keyOrder <- colnames(theData)
+  
+  atPos2[['data']] <-
+    data.frame('value' = unlist(theData[1:splitAfter], use.names = FALSE),
+               'attribute' = keyOrder[1:splitAfter])
+  atPos1[['data']] <-
+    data.frame('value' = unlist(theData[startAfterSplit:totalNbrRows], use.names =
+                                  FALSE),
+               'attribute' = keyOrder[startAfterSplit:totalNbrRows])
+  
+  result <- list("first" = atPos1,
+                 "second" = atPos2)
+  
+}
+
+
+splitReasons <-
+  splitInHalfAfterRow(out.slide25.Q34.reasonchoosebrand.HB)
+
+
+reason1Formatted <- returnChartDataAndMetaData(splitReasons[['first']])
+
+reason2Formatted <- returnChartDataAndMetaData(splitReasons[['second']])
+
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4266,7 +4363,7 @@ whatsMostImportantFormatted <- returnChartDataAndMetaData(
 ##    Pre.Format(out.slide14.c2.q13.brandreclikelihood.HSB)
 ##  formatted.slide1516.Q15.brandperf <-
 ##    Pre.Format(out.slide1516.Q15.brandperf.UK)
-##  
+##
 ##  formatted.slide21.r1c1.Q16.lastbrandpurch <-
 ##    Pre.Format(out.slide21.r1c1.Q16.lastbrandpurch.HB)
 ##  formatted.slide21.r1c2.Q17.triptype <-
@@ -4338,7 +4435,7 @@ returnDataFrameFromRow <- function (dataObj, idx) {
     'keyOrder' = dataObj[['keyOrder']],
     'data' = currentData
   )
-  result <-returnChartDataAndMetaData(returnList)
+  result <- returnChartDataAndMetaData(returnList)
 }
 
 
@@ -4347,74 +4444,116 @@ returnDataFrameFromRow <- function (dataObj, idx) {
 
 
 processedData <- list(
-  "gender" = genderFormatted, #slide 4
-  "region" = regionFormatted , #slide 4
-  "income" = inComeFormatted, #slide 4
-  "ethnicity" = ethnicityFormatted, #slide 4 
-  "householdSize" = householdSizeFormatted, #slide 4
-  "householdComposition" = householdCompositionFormatted, #slide 4
-  "generation" = generationFormatted, #slide 4
-  "Urbanicity" = urbanicityFormatted, #slide 4
-  "sustainabilityAttitudes" = sustainabilityFormatted, #slide 5
-  "purchaseRecency" = purchaseRecencyFormatted, #slide 6
-  "purchaseFrequency" = purchaseFrequncyFormatted, #slide 6 
+  "gender" = genderFormatted,
+  #slide 4
+  "region" = regionFormatted ,
+  #slide 4
+  "income" = inComeFormatted,
+  #slide 4
+  "ethnicity" = ethnicityFormatted,
+  #slide 4
+  "householdSize" = householdSizeFormatted,
+  #slide 4
+  "householdComposition" = householdCompositionFormatted,
+  #slide 4
+  "generation" = generationFormatted,
+  #slide 4
+  "urbanicity" = urbanicityFormatted,
+  #slide 4
+  "sustainabilityAttitudes" = sustainabilityFormatted,
+  #slide 5
+  "purchaseRecency" = purchaseRecencyFormatted,
+  #slide 6
+  "purchaseFrequency" = purchaseFrequncyFormatted,
+  #slide 6
   #### slide 7 charts are appended at the end to processedData via a loop ###
-
+  
+  
   ### don't know what these are for START ?
-#  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
-#  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
-#  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
-#  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
+  #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
+  #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
+  #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
+  #  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
   ### don't know what these are for END ?
-  "whereTheyShop" = whereTheyShopFormatted, #slide 8 # out.slide8.Q5.wheretheyshop.VSB
-  "whatsImportant" = whatsImportantFormatted, #slide 9
-### "unaidedBrandAwareness" = MISSING  ###
-  "aidedBrandAwareness" = aidedAwarenessFormatted, #Slide 10 unaided is missing
 
-### SLIDE 11 ###
-# "brandFunnel" = out.slide11.Q8Q9.brandfunnel.HB
-### brand funnel charts are split and will be appended at the end of the processedData 
-### via a loop brand1-xxx
 
-  "recencyOfBrand" = recencyOfBrandsFormatted, #slide 12
-  "satisfactionBrandAvailable" = satisfactionBrandAvailableFormatted, #slide 12 && slide 13
-  "recencBrandPurchase" = recencyOfBrandsFormatted, #slide 13
-  "recencyBrandUsage" = recencyBrandUsageFormatted, #slide 13
-  "brandAffinity" = brandAffinityFormatted, #out.slide14.c1.q12.brandaffinity.HSB #slide 14
-  "likelihoodToRecommendBrand" = likelihoodToRecommendBrandFormatted, #formatted.slide14.c2.q13.brandreclikelihood, # slide 14
-  "categoryBrandTopFeatures"= brandTopFeaturesFormatted, # slide 17, 18 out.slide1516.Q15.brandperf.UK         #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
-
-  "brandPerceptualMap" = out.slide19.q15.pmap.SP,  # slide 19 don't know which row maps to which attribute or brand?
-
+  "whereTheyShop" = whereTheyShopFormatted,
+  #slide 8 # out.slide8.Q5.wheretheyshop.VSB
+  "whatsImportant" = whatsImportantFormatted,
+  #slide 9
+  ### "unaidedBrandAwareness" = MISSING  ###
+  "aidedBrandAwareness" = aidedAwarenessFormatted,
+  #Slide 10 unaided is missing
+  
+  ### SLIDE 11 ###
+  # "brandFunnel" = out.slide11.Q8Q9.brandfunnel.HB
+  ### brand funnel charts are split and will be appended at the end of the processedData
+  ### via a loop brand1-xxx
+  
+  "recencyOfBrand" = recencyOfBrandsFormatted,
+  #slide 12
+  "satisfactionBrandAvailable" = satisfactionBrandAvailableFormatted,
+  #slide 12 && slide 13
+  "recencyBrandPurchase" = recencyOfBrandsFormatted,
+  #slide 13
+  "recencyBrandUsage" = recencyBrandUsageFormatted,
+  #slide 13
+  "brandAffinity" = brandAffinityFormatted,
+  #out.slide14.c1.q12.brandaffinity.HSB #slide 14
+  "likelihoodToRecommendBrand" = likelihoodToRecommendBrandFormatted,
+  #formatted.slide14.c2.q13.brandreclikelihood, # slide 14
+  "categoryBrandTopFeatures" = brandTopFeaturesFormatted,
+  # slide 17, 18 out.slide1516.Q15.brandperf.UK         #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
+  
+  "brandPerceptualMap" = out.slide19.q15.pmap.SP,
+  # slide 19 don't know which row maps to which attribute or brand?
+  
   ##### categoryDriversAnalysis Slide 20 is missing ###########
-#  "pmap" = formatted.slide19.q15.pmap,
-
- "lastBrandPurchased" = lastBrandPurchaseFormatted, #slide 21
- "shoppingTripType" = shoppintTripTypeFormatted, #slide 21
- "topPurchaseChannels" = topPurchaseChannelsFormatted, # slide 21
- "pricePaid" = pricePaidFormatted, #slide 21
- "substitutability" = substitutabilityFormatted, #slide 21
- "typeOfOccasion" = typeOfOccasionFormatted, #slide 21
- "intendedUser" = intendedUserForamtted, #slide 21
-
- "physicalStore1" = plannedFormatted, #slide 22
- "physicalStore2" = spontaneousFormatted, #slide 22
-
- "onlinePurchase1" = fulfillmentFormatted, # slide 23
- "onlinePurchase2" = onlinePlannedFormatted, # slide 23
- "onlinePurchase3" = onlineSpontaneousFormatted,  # slide 23
-
- "lastBrandConsumed" = lastBrandConsumedFormatted, # slide 24
- "mealType" = mealTypeFormatted, # slide 24
- "usageType" = usageTypeFormatted, # slide 24 
- "occasionType" = ocassionTypeFormatted, # slide 24
- "dayOfWeek" = dayOfWeekFormatted, # slide 24
- "locatoin" = locationFormatted, # slide 24
- "consumedWith"= consumedWithFormatted, # slide 24
- "whatsMostImportant" = whatsMostImportantFormatted #out.slide24.r2c4.Q35.reasons.HB
-
-#  "reasons" = formatted.slide24.r2c4.Q35.reasons,
-#  "reason.choose.brand" = out.slide25.Q34.reasonchoosebrand.HB
+  #  "pmap" = formatted.slide19.q15.pmap,
+  
+  "lastBrandPurchase" = lastBrandPurchaseFormatted,
+  #slide 21
+  "shoppingTripType" = shoppintTripTypeFormatted,
+  #slide 21
+  "topPrchaseChannels" = topPurchaseChannelsFormatted,
+  # slide 21
+  "pricePaid" = pricePaidFormatted,
+  #slide 21
+  "substitutability" = substitutabilityFormatted,
+  #slide 21
+  "typeOfOccasion" = typeOfOccasionFormatted,
+  #slide 21
+  "intendedUser" = intendedUserForamtted,
+  #slide 21
+  "physicalStore1" = plannedFormatted,
+  #slide 22
+  "physicalStore2" = spontaneousFormatted,
+  #slide 22
+  "onlinePurchase1" = fulfillmentFormatted,
+  # slide 23
+  "onlinePurchase2" = onlinePlannedFormatted,
+  # slide 23
+  "onlinePurchase3" = onlineSpontaneousFormatted,
+  # slide 23
+  "lastBrandConsumed" = lastBrandConsumedFormatted,
+  # slide 24
+  "mealType" = mealTypeFormatted,
+  # slide 24
+  "usageType" = usageTypeFormatted,
+  # slide 24
+  "occasionType" = ocassionTypeFormatted,
+  # slide 24
+  "dayOfWeek" = dayOfWeekFormatted,
+  # slide 24
+  "location" = locationFormatted,
+  # slide 24
+  "consumedWith" = consumedWithFormatted,
+  # slide 24
+  "whatsMostImportant" = whatsMostImportantFormatted,
+  #out.slide24.r2c4.Q35.reasons.HB slide 24
+  "reason1" =  reason1Formatted,
+  #slide 25
+  "reason2" =  reason2Formatted
 )
 
 # for (x in 1:length(purchaseFrequencySubCategory)) {
@@ -4429,16 +4568,19 @@ processedData <- list(
 
 
 ### slide 7 START
-subcategoriesAppend <- out.slide7.Q3.subcatpurchfreq.HB #as.data.frame(t(as.matrix(out.slide7.Q3.subcatpurchfreq.HB[['pct.response']])))
-for(x in 1:length(subcategoriesAppend[['data']])){
-  processedData[[paste('subcategory', x, sep='')]] <- returnDataFrameFromRow(subcategoriesAppend,x)
+subcategoriesAppend <-
+  out.slide7.Q3.subcatpurchfreq.HB #as.data.frame(t(as.matrix(out.slide7.Q3.subcatpurchfreq.HB[['pct.response']])))
+for (x in 1:length(subcategoriesAppend[['data']])) {
+  processedData[[paste('subcategory', x, sep = '')]] <-
+    returnDataFrameFromRow(subcategoriesAppend, x)
 }
 ### slide 7 END
 
 ### slide 11 START
 brandsFunnel <- out.slide11.Q8Q9.brandfunnel.HB
-for(x in 1:length(brandsFunnel[['data']])){
-  processedData[[paste('brand', x, sep='')]] <- returnDataFrameFromRow(brandsFunnel,x)
+for (x in 1:length(brandsFunnel[['data']])) {
+  processedData[[paste('brand', x, sep = '')]] <-
+    returnDataFrameFromRow(brandsFunnel, x)
 }
 
 ### slide 11 END
@@ -4447,7 +4589,9 @@ for(x in 1:length(brandsFunnel[['data']])){
 if (debug) {
   processedDataJSON <-
     toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
-  lapply(processedDataJSON, write, "./RscriptTests/crauProcessedData3.json")
+  lapply(processedDataJSON,
+         write,
+         "./RscriptTests/crauProcessedData3.json")
 } else {
   ## NOTE we need this in this format as for our reporting framework the last R script output needs to be that processedDataJSON
   processedDataJSON <-
