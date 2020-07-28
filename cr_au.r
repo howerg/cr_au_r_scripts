@@ -2639,14 +2639,25 @@ Fulfillment.Data <- function(id.fulfill, respondent.index) {
   
   pct.response <- fulfill.count$pct.response
   rownames(pct.response) <- level.string
-  colnames(pct.response) <- "Fulfillment Type"
+  colnames(pct.response) <- "value"
   
   result <- list(
     "n.valid" = fulfill.count$n.valid,
     "pct.response" = pct.response,
     "curr.id" = id.fulfill,
     "orientation" = "h",
-    "title" = "Fulfillment Type"
+    "title" = "Fulfillment Type",
+    "baseSize" = fulfill.count$n.valid,
+    "data" = pct.response,
+    "questionID" = id.fulfill,
+    'chartType' = 'bar',
+    'colors' = c("#03045e",
+          "#023e8a",
+          "#0077b6",
+          "#0096c7",
+          "#00b4d8",
+          "#48cae4"),
+    'keyOrder' = level.string
   )
 }
 
@@ -2708,6 +2719,7 @@ Horizontal.Bar.Chart.Subset <-
       'data' = transposedData,
       'keyOrder' = keyOrder,
       'baseSize' = sort.n.valid,
+      'chartType' = 'bar',
       'questionID' = c("Q21", "Q22"),
       'orientation' = "h",
       'colors' = c("#71952c",
@@ -4093,6 +4105,21 @@ spontaneousFormatted <-returnChartDataAndMetaData(
   out.slide22.Q21.22.lastpurchphys$spontaneous
 )
 
+
+fulfillmentFormatted <- returnChartDataAndMetaData(
+  out.slide23.Q20to22.lastpurchonline$fulfillment
+)
+
+
+onlinePlannedFormatted <- returnChartDataAndMetaData(
+  out.slide23.Q20to22.lastpurchonline$planned
+)
+
+onlineSpontaneousFormatted <- returnChartDataAndMetaData(
+  out.slide23.Q20to22.lastpurchonline$spontaneous
+)
+
+
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4233,10 +4260,12 @@ processedData <- list(
  "intendedUser" = intendedUserForamtted, #slide 21
 
  "physicalStore1" = plannedFormatted, #slide 22
- "physicalStore2" = spontaneousFormatted #slide 22
-#  "last.purchase.physical.planned" = formatted.slide22.Q21.22.c1.lastpurchphysplan,
-#  "last.purchase.physical.spontaneous" = formatted.slide22.Q21.22.c2.lastpurchphysspont,
-#  "last.purchase.online.fulfillment" = formatted.slide23.Q20to22.c1.lastpurchonlinefulfill,
+ "physicalStore2" = spontaneousFormatted, #slide 22
+
+ "onlinePurchase1" = fulfillmentFormatted, # slide 23
+ "onlinePurchase2" = onlinePlannedFormatted, # slide 23
+ "onlinePurchase3" = onlineSpontaneousFormatted  # slide 23
+
 #  "last.purchase.online.planned" = formatted.slide23.Q20to22.c2.lastpurchonlineplan,
 #  "last.purchase.online.spontaneous" = formatted.slide23.Q20to22.c3.lastpurchonlinespont,
 #  "last.brand.consumed" = formatted.slide24.r1c1.q27.lastbrandcons,
