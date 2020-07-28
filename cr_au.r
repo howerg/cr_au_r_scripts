@@ -3377,8 +3377,8 @@ Q29.Single.Column <- function(curr.id, n.level, report.level) {
       sum(valid.data == x))) / n.valid
   
   # hard-coded labels:
-  names(pct.level) <-
-    c(
+
+  keyOrder <-  c(
       "Pre - Bkfst",
       "Bkfst",
       "Bkfst - Lunch",
@@ -3387,14 +3387,29 @@ Q29.Single.Column <- function(curr.id, n.level, report.level) {
       "Dinner",
       "After Dinner"
     )
-  
+
+ # names(pct.level) <- keyOrder
+
+  data <- data.frame('value'=pct.level[report.level],'attribute'=keyOrder) 
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level[report.level]),
     "curr.id" = curr.id,
     "orientation" = "h",
-    "title" = 'Meal Type'
+    "title" = 'Meal Type',
+    "orientation" = "h",
+      "chartType" = "bar",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -4141,6 +4156,10 @@ lastBrandConsumedFormatted <- returnChartDataAndMetaData (
   out.slide24.r1c1.q27.lastbrandcons.HB
 )
 
+
+mealTypeFormatted <- returnChartDataAndMetaData(
+  out.slide24.r1c2.Q29.mealtype.HB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4287,8 +4306,8 @@ processedData <- list(
  "onlinePurchase2" = onlinePlannedFormatted, # slide 23
  "onlinePurchase3" = onlineSpontaneousFormatted,  # slide 23
 
- "lastBrandConsumed" = lastBrandConsumedFormatted # slide 24
-#  "last.brand.consumed" = formatted.slide24.r1c1.q27.lastbrandcons,
+ "lastBrandConsumed" = lastBrandConsumedFormatted, # slide 24
+ "mealType" = mealTypeFormatted # slide 24
 #  "meal.type" = formatted.slide24.r1c2.Q29.mealtype,
 #  "usage.type" = formatted.slide24.r1c3.Q32.usagetype,
 #  "occasion.type" = formatted.slide24.r1c4.Q33.occtype,
