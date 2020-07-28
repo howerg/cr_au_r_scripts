@@ -3595,22 +3595,34 @@ Q30.Single.Column <- function(curr.id, n.level, report.level) {
   pct.level.sorted <- pct.level[pct.level.order]
   
   # hard-coded labels:
-  names.Q30 <-
+  keyOrder <-
     c("Home",
       "School",
       "Work",
       "Others' Home",
       "In Transit")
-  names.Q30.sorted <- names.Q30[pct.level.order]
+  keyOrder <- keyOrder[pct.level.order]
   
-  names(pct.level.sorted) <- names.Q30.sorted
+  #names(pct.level.sorted) <- names.Q30.sorted
+  data <- data.frame('value'=pct.level.sorted[report.level],'attribute'=keyOrder) 
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = as.data.frame(pct.level.sorted[report.level]),
     "curr.id" = curr.id,
     "orientation" = "h",
-    "title" = 'Location'
+    "title" = 'Location',
+      "chartType" = "bar",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = n.valid,
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -3639,14 +3651,15 @@ Q31.new <- function(curr.id) {
   
   
   
-  names(curr.pct.response) <-
+  #names(curr.pct.response)
+  keyOrder <-
     c("Self Only",
       "Other Adult",
       "Kids 0-12",
       "Kids 13-17",
       "Someone Else")
   
-  
+  data <- data.frame('value'=unlist(curr.pct.response, use.names=FALSE),'attribute'=keyOrder) 
   #sort.pct.response <- sort(curr.pct.response, 'decreasing' = TRUE)
   
   result <- list(
@@ -3655,7 +3668,18 @@ Q31.new <- function(curr.id) {
     'question' = label.and.data$data.map$qtitle[1],
     "curr.id" = curr.id,
     "pct.response" = curr.pct.response,
-    "orientation" = "h"
+    "orientation" = "h",
+      "chartType" = "bar",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = curr.n.valid,
+      'questionID' = label.and.data$data.map$qtitle[1],
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
 }
 
@@ -3682,13 +3706,27 @@ Q35 <- function(curr.id) {
   
   sort.pct.response <- sort(curr.pct.response, 'decreasing' = TRUE)
   
+  data <- rev(sort.pct.response[1:3])
+  keyOrder <- rev(colnames(data))
+  data <- data.frame('value'=unlist(data,use.names=FALSE), 'attribute'=keyOrder)
   result <- list(
     "title" = "Reasons",
     "n.valid" = curr.n.valid,
     'question' = label.and.data$data.map$qtitle[1],
     "pct.response" = sort.pct.response[1:3],
     "orientation" = "h",
-    "curr.id" = curr.id
+    "curr.id" = curr.id,
+      "chartType" = "bar",
+      'data' = data,
+      'keyOrder' = keyOrder,
+      'baseSize' = curr.n.valid,
+      'questionID' = curr.id,
+      'colors' = c("#71952c",
+            "#92b64e",
+            "#92c039",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
   )
   
 }
@@ -4208,6 +4246,18 @@ ocassionTypeFormatted <- returnChartDataAndMetaData(
 dayOfWeekFormatted <- returnChartDataAndMetaData(
   out.slide24.r2c1.Q28.dayofweek.HB
 )
+
+locationFormatted <- returnChartDataAndMetaData(
+  out.slide24.r2c2.Q30.location.HB
+)
+
+consumedWithFormatted <- returnChartDataAndMetaData(
+  out.slide24.r2c3.Q31.whowith.HB
+)
+
+whatsMostImportantFormatted <- returnChartDataAndMetaData(
+  out.slide24.r2c4.Q35.reasons.HB
+)
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4358,11 +4408,11 @@ processedData <- list(
  "mealType" = mealTypeFormatted, # slide 24
  "usageType" = usageTypeFormatted, # slide 24 
  "occasionType" = ocassionTypeFormatted, # slide 24
- "dayOfWeek" = dayOfWeekFormatted # slide 24
+ "dayOfWeek" = dayOfWeekFormatted, # slide 24
+ "locatoin" = locationFormatted, # slide 24
+ "consumedWith"= consumedWithFormatted, # slide 24
+ "whatsMostImportant" = whatsMostImportantFormatted #out.slide24.r2c4.Q35.reasons.HB
 
-#  "day.of.week" = formatted.slide24.r2c1.Q28.dayofweek,
-#  "location" = formatted.slide24.r2c2.Q30.location,
-#  "who.with" = formatted.slide24.r2c3.Q31.whowith,
 #  "reasons" = formatted.slide24.r2c4.Q35.reasons,
 #  "reason.choose.brand" = out.slide25.Q34.reasonchoosebrand.HB
 )
