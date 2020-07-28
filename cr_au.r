@@ -105,8 +105,9 @@ returnChartDataAndMetaData <- function (object,
     returnObject['subTitle'] <- object[['subTitle']]
   }
 
-  if (!is.null(supplement)) {
-    returnObject <- c(returnObject, list("supplement" = supplement))
+  if (!is.null(object[['supplement']])) {
+    print(paste('has supplent', object[['questionID']]))
+    returnObject[['supplement']] <- object[['supplement']]
   }
   
   result <- returnObject
@@ -2667,7 +2668,7 @@ Horizontal.Bar.Chart.Subset <-
     select.data <- all.data[prep.map$index, ]
     
     select.count <- Data.Level.Count(select.data, 1)
-    
+  
     order.pct.response <-
       order(select.count$pct.response, decreasing = TRUE)
     
@@ -2694,6 +2695,7 @@ Horizontal.Bar.Chart.Subset <-
     transposedData <- as.data.frame(t(as.matrix(data)))
     colnames(transposedData) <- c('value')
     
+    percentage <- round((prep.map$n / n.location) *100, digits=0)
     supplement <- list("prep" = prep.string,
                        "pct.prep" = prep.map$n / n.location)
     
@@ -2702,7 +2704,7 @@ Horizontal.Bar.Chart.Subset <-
       "pct.response" = sort.pct.response,
       "curr.id" = c("Q21", "Q22"),
       "orientation" = "h",
-      "title" = paste(location.string, prep.string),
+      "title" = paste(prep.string ,' ', percentage, '%', sep=''),
       "supplement" = supplement,
       'data' = transposedData,
       'keyOrder' = keyOrder,
@@ -2742,6 +2744,12 @@ Purchase.Prep <-
                                   location.map,
                                   all.data,
                                   n.location)
+
+    totalResponding <- planned[['baseSize']][1] + spontaneous[['baseSize']][[1]]
+
+    ## don't knwo how to calculate the %ages for planned vs sponteneous 
+    ## plannedPercent <- round(planned[['baseSize']][1]/totalResponding, digits=2)
+    ## print(paste('plannedPercent', plannedPercent, 'totalResponding', totalResponding, ' planned basesize 1', planned[['baseSize']][1]))
     
     if (fulfill) {
       online.repondent.index <- c(location.map$planned$index,
