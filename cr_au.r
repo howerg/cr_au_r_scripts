@@ -698,7 +698,11 @@ Single.Column.With.Significance <-
     
     combined <- cbind(curr.count$pct.response, significance)
     colnames(combined) <- c("pct", "significance")
+
+    colnames(curr.count$pct.response) <- c('value')
     
+
+    keyOrder <- rownames(curr.count$pct.response)
     result <- list(
       "title" = "Last Brand Consumed",
       "n.valid" = curr.count$n.valid,
@@ -707,7 +711,20 @@ Single.Column.With.Significance <-
       "data.without.significance" = curr.count$pct.response,
       "significance" = significance,
       "orientation" = "h",
-      "p.value" = p.value
+      "p.value" = p.value,
+      "orientation" = "h",
+      'data' = curr.count$pct.response,
+      'baseSize' = curr.count$n.valid,
+      "questionID" = curr.id,
+      'chartType' = 'bar',
+      'keyOrder' = keyOrder,
+      'colors' = c("#d4e6c0",
+            "#c0db9c",
+            "#a8d16b",
+            "#92c039",
+            "#92b64e",
+            "#71952c")
+    
     )
   }
 
@@ -4120,6 +4137,10 @@ onlineSpontaneousFormatted <- returnChartDataAndMetaData(
 )
 
 
+lastBrandConsumedFormatted <- returnChartDataAndMetaData (
+  out.slide24.r1c1.q27.lastbrandcons.HB
+)
+
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4264,10 +4285,9 @@ processedData <- list(
 
  "onlinePurchase1" = fulfillmentFormatted, # slide 23
  "onlinePurchase2" = onlinePlannedFormatted, # slide 23
- "onlinePurchase3" = onlineSpontaneousFormatted  # slide 23
+ "onlinePurchase3" = onlineSpontaneousFormatted,  # slide 23
 
-#  "last.purchase.online.planned" = formatted.slide23.Q20to22.c2.lastpurchonlineplan,
-#  "last.purchase.online.spontaneous" = formatted.slide23.Q20to22.c3.lastpurchonlinespont,
+ "lastBrandConsumed" = lastBrandConsumedFormatted # slide 24
 #  "last.brand.consumed" = formatted.slide24.r1c1.q27.lastbrandcons,
 #  "meal.type" = formatted.slide24.r1c2.Q29.mealtype,
 #  "usage.type" = formatted.slide24.r1c3.Q32.usagetype,
