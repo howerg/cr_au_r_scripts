@@ -1631,9 +1631,8 @@ Q2.Single.Column <- function(curr.id, n.level, report.level) {
   # pct.report <- as.data.frame(pct.level)
   pct.report <- as.data.frame(pct.level[report.level])
   
-  # hard-coded labels:
-  rownames(pct.report) <-
-    c(
+
+  rowNames <- c(
       "Weekly",
       "Every 2 - 3 weeks",
       "Monthly",
@@ -1643,14 +1642,34 @@ Q2.Single.Column <- function(curr.id, n.level, report.level) {
       "Every 7 - 12 Months",
       " < 1 x Year"
     )
-  
+    
+  # hard-coded labels:
+  rownames(pct.report) <-rowNames
+
+  data <-
+    data.frame('attribute' = rowNames, 'value' = pct.level[report.level])
   
   result <- list(
     "n.valid" = n.valid,
     "pct.response" = pct.report,
     "title" = "Category Usage Recency",
     "curr.id" = curr.id,
-    "orientation" = "h"
+    "orientation" = "h",
+    "baseSize" = n.valid,
+    "data"= data,
+    "subTitle" = paste("How often have you personally consumed ", cat.name, "?", sep = ""),
+    "questionID" = curr.id,
+    "chartType" = "bar",
+    "keyOrder" = rowNames,
+    'orientation' = 'h',
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -1710,8 +1729,7 @@ Q4 <- function(curr.id, n.level) {
     as.data.frame(category.pct.purchase.frequency.level[c(1, 2, 3, 4, 5, 11, 6, 7, 8, 12)])
   
   # hard-coded labels:
-  rownames(output.pct.purchase.frequency) <-
-    c(
+  rowNames <-     c(
       "Daily",
       "Several Times / Week",
       "Weekly",
@@ -1723,13 +1741,31 @@ Q4 <- function(curr.id, n.level) {
       "Every 7 - 12 Months",
       " < 1 x Year"
     )
+  rownames(output.pct.purchase.frequency) <- rowNames
+  data <-
+    data.frame('attribute' = rowNames, 'value' = category.pct.purchase.frequency.level[c(1, 2, 3, 4, 5, 11, 6, 7, 8, 12)])
   
   result <- list(
     "n.valid" = category.frequency.n.valid,
     "pct.response" = output.pct.purchase.frequency,
     "title" = "Category Usage Frequency",
     "currid" = curr.id,
-    "orientation" = "h"
+    "orientation" = "h",
+    "baseSize" = category.frequency.n.valid,
+    "data"= data,
+    "subTitle" = paste("How often do you personally consume/use  ", cat.name, "?", sep = ""),
+    "questionID" = curr.id,
+    "chartType" = "bar",
+    "keyOrder" = rowNames,
+    'orientation' = 'h',
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    )
   )
 }
 
@@ -4397,6 +4433,11 @@ reason1Formatted <- returnChartDataAndMetaData(splitReasons[['first']])
 
 reason2Formatted <- returnChartDataAndMetaData(splitReasons[['second']])
 
+
+consumptionRecencyFormatted <- returnChartDataAndMetaData(out.slide6A.c1.Q2.catconsrec.HB)
+
+consumptionFrequencyFormatted <- returnChartDataAndMetaData(out.slide6a.c2.Q4.catconsfreq.HB)
+
 ###JSON FORMATTING EXAMPLE END ###
 
 
@@ -4460,7 +4501,10 @@ processedData <- list(
 
   ### don't know what these are for START ?
   #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
+
+  "consumptionRecency" = consumptionRecencyFormatted,
   #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
+  "consumptionFrequency" = consumptionFrequencyFormatted,
   #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
   #  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
   ### don't know what these are for END ?
