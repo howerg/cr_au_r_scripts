@@ -1888,7 +1888,7 @@ Slide7a.Q4 <- function(curr.id, n.level) {
       colSums(curr.pct.response[9:10,])
     )
   
-  out.row.names <-
+  rowNames <-
     c(
       "Daily",
       "Several Times / Week",
@@ -1902,8 +1902,8 @@ Slide7a.Q4 <- function(curr.id, n.level) {
       " < 1 x Year"
     )
   
-  rownames(out.n.response) <- out.row.names
-  rownames(out.pct.response) <- out.row.names
+  rownames(out.n.response) <- rowNames
+  rownames(out.pct.response) <- rowNames
   
   data.map.index <-
     match(row.variable, example.data.map.variables$label)
@@ -1954,13 +1954,24 @@ Slide7a.Q4 <- function(curr.id, n.level) {
     }
   }
   
-  result <- list(
-    "n.valid" = curr.n.valid,
-    "pct.response" = out.pct.response,
-    #"significance" = significance
+
+
+    result <- list(
+    "baseSize" = curr.n.valid,
+    "data" = out.pct.response,
+    "questionID" = curr.id,
     "title" = "Subcategory Usage Recency",
     "orientation" = "h",
-    "curr.id" = curr.id
+    'chartType' = 'bar',
+    'colors' = c(
+      "#d4e6c0",
+      "#c0db9c",
+      "#a8d16b",
+      "#92c039",
+      "#92b64e",
+      "#71952c"
+    ),
+    'keyOrder' = rowNames
   )
 }
 
@@ -4502,13 +4513,8 @@ processedData <- list(
   ### don't know what these are for START ?
   #  "catPurchFreq" = formatted.slide6.c2.Q3.catpurchfreq,
 
-  "consumptionRecency" = consumptionRecencyFormatted,
-  #  "catUsageRec" = formatted.slide6A.c1.Q2.catconsrec,
-  "consumptionFrequency" = consumptionFrequencyFormatted,
-  #  "catUsageFreq" = formatted.slide6a.c2.Q4.catconsfreq,
-  #  "subcatUsageFreq" = formatted.slide7a.Q4.subcatconsfreq,
-  ### don't know what these are for END ?
-
+  "consumptionRecency" = consumptionRecencyFormatted, # slide 26
+  "consumptionFrequency" = consumptionFrequencyFormatted, #slide 27
 
   "whereTheyShop" = whereTheyShopFormatted,
   #slide 8 # out.slide8.Q5.wheretheyshop.VSB
@@ -4608,6 +4614,16 @@ for (x in 1:length(subcategoriesAppend[['data']])) {
     returnDataFrameFromRow(subcategoriesAppend, x)
 }
 ### slide 7 END
+
+
+### slide 27 START
+consumptionCatFrequency <- out.slide7a.Q4.subcatconsfreq.HB
+for (x in 1:length(consumptionCatFrequency[['data']])) {
+  processedData[[paste('consumptionFrequencySubCategory', x, sep = '')]] <-
+    returnDataFrameFromRow(consumptionCatFrequency, x)
+}
+
+### slide 27 END
 
 ### slide 11 START
 brandsFunnel <- out.slide11.Q8Q9.brandfunnel.HB
