@@ -126,6 +126,32 @@ returnChartDataAndMetaData <- function (object,
   result <- returnObject
 }
 
+
+appendScatterPlotMetaData <- function(obj, quadrants=NULL){
+  bgTxtColors <-list(
+    'backgroundColor'='#409FE4',
+    'textColor' = '#FFFFFF'
+  )
+  qColor <- list('color'='#FFFFFF')
+  xAxis <- bgTxtColors
+  yAxis <- bgTxtColors
+  quadrantsDefault <- list(
+    'topRight' = qColor,
+    'bottomRight' = qColor,
+    'topLeft' = qColor,
+    'bottomLeft' = qColor
+  )
+
+  obj[['metadata']][['xAxis']] = xAxis
+  obj[['metadata']][['yAxis']] = yAxis
+  obj[['hasUserInputs']] = TRUE
+  obj[['quadrants']] = if(is.null(quadrants)) quadrantsDefault else quadrants
+
+  result <- obj
+
+}
+
+
 convertTotableDataFormat <- function(data, keys) {
   percent100List <- list()
   for (i in 1:length(data)) {
@@ -182,13 +208,287 @@ createDataFrameOfTwoLists <-
   }
 
 
-# names(example.data.map.variables)
-# [1] "vgroup"   "qtitle"   "colTitle" "title"    "rowTitle" "label"    "row"
-# [8] "type"     "col"      "qlabel"   "values"
 
-# names(example.data.map.questions)
-# [1] "qtitle"    "variables" "values"    "qlabel"    "type"      "grouping"
 
+attribute.full.statement <-
+  c(
+    "Is a better value than other brands",
+    "Provides the cheapest price",
+    "Is made from better ingredients than other brands",
+    "Appeals to the whole family",
+    "Is for someone like me",
+    "Fits my diet plan",
+    "Is easy to find in the store",
+    "When shopping, I don't think much about it; I'm typically on auto-pilot",
+    "Is the highest possible quality regardless of price",
+    "Is an acceptable quality at a fair price",
+    "Is a brand that is innovative/setting trends",
+    "Is a brand made by a company that has been around a long time",
+    "Is a brand I have been buying for a long time",
+    "Is free of artificial ingredients",
+    "Has a short list of ingredients",
+    "Has ingredients I recognize/understand what they are",
+    "Has eco-friendly packaging",
+    "Is organic",
+    "Is ready to use/minimum or no prep needed",
+    "Is good for on-the-go",
+    "Packaging is easy to store",
+    "Packaging keeps the product fresh",
+    "Comes in a variety of sizes"
+  )
+
+attribute.brief.statement <-
+  c(
+    "Better value",
+    "Cheapest price",
+    "Better ingredients",
+    "Whole family appeal",
+    "For someone like me",
+    "Fits diet plan",
+    "Easy to find in store",
+    "'Auto-pilot' purchase",
+    "Highest possible quality",
+    "OK quality for price",
+    "Innovative",
+    "Established company",
+    "I've bought for long time",
+    "No artificial ingredients",
+    "Short ingredient list",
+    "Ingredients I recognize",
+    "Eco-friendly packaging",
+    "Organic",
+    "No prep needed",
+    "Good on the go",
+    "Easy storage packaging",
+    "Keep-fresh packaging",
+    "Comes in variety/sizes"
+  )
+
+
+Attribute.Statement <- function(full.statement) {
+  # full.statement may included additional statements that do not have corresponding brief statements
+  
+  ix.match <- match(full.statement, attribute.full.statement)
+  
+  brief.statement <- full.statement # default to the full statement
+  
+  jx.found <- which(!is.na(ix.match))
+  
+  brief.statement[jx.found] <-
+    attribute.brief.statement[ix.match[jx.found]]
+  
+  result <- list(
+    "n" = length(full.statement),
+    "full" = full.statement,
+    "brief" = brief.statement
+  )
+  
+}
+
+
+Q6.Prep <- function(curr.id, n.level) {
+  curr.pattern <- paste(curr.id, "r.+", sep = "")
+  
+  # find the variables that begin with the pattern
+  curr.variable.index <-
+    grep(curr.pattern, example.raw.data.variables)
+  
+  curr.variables <-
+    example.raw.data.variables[curr.variable.index]
+  # the variables may not be sorted correctly by attribute index
+  
+  # get sorted attribute indexes:
+  row.value <- Row.Value(curr.variables)
+  n.attribute <- length(row.value)
+  
+  # variables in order of increasing attribute index:
+  row.variable <-
+    Row.Variable.Name(paste(curr.id, "r", sep = ""), row.value)
+  
+  # get responses as a data.frame; one column for each attribute
+  curr.data <- Data.Value(row.variable)
+  
+  curr.count <- Data.Level.Count(curr.data, n.level)
+  
+  curr.pct.response <- curr.count$pct.response
+  
+  data.map.index <-
+    grep(curr.pattern, example.data.map.variables$label)
+  data.map.variable <- example.data.map.variables[data.map.index,]
+  
+  attribute.statement <-
+    Attribute.Statement(data.map.variable$rowTitle)
+  
+  result <- list(
+    "curr.id" = curr.id,
+    "curr.data" = curr.data,
+    "curr.count" = curr.count,
+    "data.map.variable" = data.map.variable,
+    "attribute.statement" = attribute.statement,
+    "level.label" = data.map.variable$values[1][[1]]$title
+  )
+}
+
+Correlation <- function(x, y) {
+  # exclude if either response is NA
+  
+  ix.valid <- which(!(is.na(x) | is.na(y)))
+  
+  n.valid <- length(ix.valid)
+  x.valid <- x[ix.valid]
+  y.valid <- y[ix.valid]
+  
+  result <-
+    list("n" = n.valid,
+         "correlation" =
+           (n.valid * sum(x.valid * y.valid) - sum(x.valid) * sum(y.valid)) /
+           ((
+             n.valid * sum(x.valid ^ 2) - sum(x.valid) ^ 2
+           ) *
+             (
+               n.valid * sum(y.valid ^ 2) - sum(y.valid) ^ 2
+             )) ^ 0.5)
+}
+
+
+Category.Drivers <-
+  function(brand.performance,
+           brand.affinity,
+           importance) {
+    # brand.performance
+    #	$n.respondent
+    #	$respondent.data (N*B) x A; stacked table
+    #     colnames = attribute strings in Q15r* numerical order
+    # $respondent.brand.list (4 main brand labels; stacking order)
+    #	$respondent.attribute.list
+    #
+    # brand.affinity
+    #   $pct.response
+    #     colnames = brand labels
+    #
+    # importance
+    #	$data
+    #     colnames = "somewhat", "extremely", "somewhat/extremely"
+    #     rownames = attributes, but sorted by the last column
+    
+    # first select the main brands out of brand.affinity
+    
+    n.brand <-
+      length(brand.performance$respondent.brand.list)
+    
+    n.attribute <-
+      length(brand.performance$respondent.attribute.list)
+    
+    n.stack <- n.brand * brand.performance$n.respondent
+    
+    ix.main.brand <-
+      match(
+        colnames(brand.affinity$respondent.data),
+        brand.performance$respondent.brand.list
+      )
+    
+    # stack the brand affinity responses
+    
+    brand.affinity.stack <-
+      data.frame(matrix(ncol = 1, nrow = n.stack))
+    
+    ix.hi <- 0
+    for (jx in ix.main.brand) {
+      if (is.na(jx)) {
+        next
+      }
+      
+      ix.lo <- ix.hi + 1
+      ix.hi <- ix.hi + brand.performance$n.respondent
+      
+      brand.affinity.stack[ix.lo:ix.hi, 1] <-
+        brand.affinity$respondent.data[, jx]
+    }
+    
+    importance.affinity.correlation <-
+      brand.performance$pct.response[, 1:3]
+    rownames(importance.affinity.correlation) <-
+      brand.performance$respondent.attribute.list
+    
+    ix.original <-
+      match(rownames(importance$data),
+            brand.performance$respondent.attribute.list)
+    importance.affinity.correlation[, 2] <-
+      importance$data[ix.original, 3]
+    
+    colnames(importance.affinity.correlation) <-
+      c("n", "importance", "correlation")
+    
+    for (ix in 1:n.attribute) {
+      curr.corr <- Correlation(brand.affinity.stack[, 1],
+                               brand.performance$respondent.data[, ix])
+      importance.affinity.correlation[ix, 1] <-
+        curr.corr$n
+      importance.affinity.correlation[ix, 3] <-
+        curr.corr$correlation
+    }
+    
+    result <- list(
+      "n.brand" = n.brand,
+      "n.attribute" = n.attribute,
+      "ix.main.brand" = ix.main.brand,
+      "n.valid" = importance.affinity.correlation[, 1],
+      "chartType" = "scatterplot",
+      "keyOrder" = rownames(importance.affinity.correlation),
+      "title" = "Category Drivers Analysis",
+      "curr.id" = c("Q6", "Q12", "Q15"),
+      "data" = importance.affinity.correlation[, 2:3]
+    )
+  }
+
+
+Segment.Membership <- function(id, config) {
+  # id is a string
+  # config
+  #   $order - segment indexes
+  #   $label - strings
+  
+  id.data <- Single.Column.Data(id)
+  
+  segment.count <-
+    as.data.frame(matrix(0, nrow = id.data$n.level, 1))
+  
+  for (ix in 1:id.data$n.level) {
+    segment.count[ix, 1] <- sum(id.data$data[, 1] == ix,  na.rm = TRUE)
+  }
+  
+  n.respondent = sum(segment.count)
+  
+  pct.response <-
+    as.data.frame(matrix(segment.count[config$order, 1], id.data$n.level, 1) /
+                    n.respondent)
+  
+  rownames(pct.response) <- config$label[config$order]
+
+  rowNames <-rownames(pct.response)
+  
+  result <- list(
+    "curr.id" = id,
+    "n.valid" = n.respondent,
+    "data" = data.frame('value'=unlist(pct.response),'attribute'=rowNames),
+    "keyOrder" = rowNames,
+    "title" = "Segment Membership"
+  )
+  
+}
+
+
+respondent.segment.configuration <- list(
+  "order" = c(4, 2, 3, 1, 5, 6),
+  "label" = c(
+    "Convenient Indulgers",
+    "Conscious Cooks",
+    "Watchful Nutritionists",
+    "Taste-Driven Chefs",
+    "Value Nurturers",
+    "Simplicity Seekers"
+  )
+)
 
 Field.From.Map <- function(raw.data, data.map, field.name) {
   dmv <- data.map$variables
@@ -438,7 +738,6 @@ Label.And.Data.From.ID <- function(id) {
 }
 
 
-
 Rollup.From.ID <-
   function(id,
            level.rollup,
@@ -458,12 +757,12 @@ Rollup.From.ID <-
     
     n.rollup.level = length(level.rollup)
     
-    rollup.pct <- as.data.frame(data.pct[0,])
+    rollup.pct <- as.data.frame(data.pct[0, ])
     
     for (ix in 1:n.rollup.level) {
       ix.rollup <- unlist(level.rollup[ix])
       
-      rollup.pct[ix,] = colSums(data.pct[ix.rollup,])
+      rollup.pct[ix, ] = colSums(data.pct[ix.rollup, ])
     }
     
     rownames(rollup.pct) <- rollup.desc
@@ -482,15 +781,19 @@ Rollup.From.ID <-
       "data" = rollup.pct,
       "questionID" = id,
       'chartType' = 'stackedBar',
-    'colors' = c(
-      "#d4e6c0",
-      "#c0db9c",
-      "#a8d16b",
-      "#92c039",
-      "#92b64e",
-      "#71952c")
+      'colors' = c(
+        "#d4e6c0",
+        "#c0db9c",
+        "#a8d16b",
+        "#92c039",
+        "#92b64e",
+        "#71952c"
+      ),
+      "respondent.data" = id.data
     )
   }
+
+
 
 
 Data.Labeled.Level.Count <-
@@ -546,7 +849,6 @@ Data.Labeled.Level.Count <-
       )
   }
 
-
 Rollup.From.ID.Sorted <-
   function (id,
             level.rollup,
@@ -559,7 +861,7 @@ Rollup.From.ID.Sorted <-
       Rollup.From.ID(id, level.rollup, rollup.desc, rollup.title)
     
     order.index <-
-      order(rollup.raw$pct.response[rollup.sort.index,],
+      order(rollup.raw$pct.response[rollup.sort.index, ],
             "decreasing" = TRUE)
     
     result <- list(
@@ -578,12 +880,14 @@ Rollup.From.ID.Sorted <-
       "questionID" = id,
       'chartType' = 'stackedBar',
       'colors' = c(
-      "#d4e6c0",
-      "#c0db9c",
-      "#a8d16b",
-      "#92c039",
-      "#92b64e",
-      "#71952c")
+        "#d4e6c0",
+        "#c0db9c",
+        "#a8d16b",
+        "#92c039",
+        "#92b64e",
+        "#71952c"
+      ),
+      "respondent.data" = rollup.raw$respondent.data
     )
   }
 
@@ -1982,59 +2286,25 @@ Slide7a.Q4 <- function(curr.id, n.level) {
 
 # Q6 Importance of 23 attributes
 
-Q6 <- function(curr.id, n.level, report.level) {
-  curr.pattern <- paste(curr.id, "r.+", sep = "")
-  
-  # find the variables that begin with the pattern
-  curr.variable.index <-
-    grep(curr.pattern, example.raw.data.variables)
-  
-  curr.variables <-
-    example.raw.data.variables[curr.variable.index]
-  # the variables may not be sorted correctly by attribute index
-  
-  # get sorted attribute indexes:
-  row.value <- Row.Value(curr.variables)
-  n.attribute <- length(row.value)
-  
-  # variables in order of increasing attribute index:
-  row.variable <-
-    Row.Variable.Name(paste(curr.id, "r", sep = ""), row.value)
-  
-  # get responses as a data.frame; one column for each attribute
-  curr.data <- Data.Value(row.variable)
-  
-  curr.count <- Data.Level.Count(curr.data, n.level)
-  
-  curr.pct.response <- curr.count$pct.response
-  
-  data.map.index <-
-    grep(curr.pattern, example.data.map.variables$label)
-  data.map.variable <- example.data.map.variables[data.map.index, ]
-  level.string <- data.map.variable$values[1][[1]]$title
-  
-  # attach row names
-  
+Q6 <- function(q6.prep, report.level) {
   # sort by response percentage of top two levels
   
   report.pct.response.select <-
-    curr.count$pct.response[report.level, ]
+    q6.prep$curr.count$pct.response[report.level,]
   row.names(report.pct.response.select) <-
-    level.string[report.level]
-  
+    q6.prep$level.label[report.level]
   
   report.pct.response.top.2 <-
-    report.pct.response.select[1, ] +
-    report.pct.response.select[2, ]
+    report.pct.response.select[1,] +
+    report.pct.response.select[2,]
   row.names(report.pct.response.top.2) <- 'Somewhat/Extremely'
-  #paste(n.level - 1, "+", n.level, sep = "")
   
   top.2.order <- order(report.pct.response.top.2, decreasing = TRUE)
   
   report.pct.response <-
     rbind(report.pct.response.select, report.pct.response.top.2)
   
-  curr.row.title <- data.map.variable$rowTitle[top.2.order]
+  curr.row.title <- q6.prep$attribute.statement$brief[top.2.order]
   
   colnames(report.pct.response) <- curr.row.title
   
@@ -2044,16 +2314,16 @@ Q6 <- function(curr.id, n.level, report.level) {
   rowNames <- names(transposedData)
   
   result <- list(
-    #"n.valid" = curr.count$n.valid[top.2.order],
-    #"n.response" = curr.count$n.response[, top.2.order],
+    #"n.valid" = q6.prep$curr.count$n.valid[top.2.order],
+    #"n.response" = q6.prep$curr.count$n.response[, top.2.order],
     #"pct.response" = report.pct.response[, top.2.order],
     "top.2.order" = top.2.order,
     #"curr.id" =  curr.variables,
     "chartType" = "stackedBar",
     "title" = "What's Important",
-    "baseSize" = curr.count$n.valid[top.2.order],
+    "baseSize" = q6.prep$curr.count$n.valid[top.2.order],
     "data" = transposedData,
-    "questionID" = curr.variables,
+    "questionID" = q6.prep$curr.id,
     "orientation" = 'v',
     'colors' = c(
       "#71952c",
@@ -2063,10 +2333,10 @@ Q6 <- function(curr.id, n.level, report.level) {
       "#92b64e",
       "#71952c"
     ),
-    'keyOrder' = rowNames
+    'keyOrder' = rowNames,
+    "respondent.data" = q6.prep$curr.data
   )
 }
-
 
 #### BEGIN SLIDE 10 CHART 2 AIDED BRAND AWARENESS
 
@@ -2347,15 +2617,32 @@ Q15 <- function (curr.id, question.order, aided.order) {
   
   curr.n.valid <- matrix(0, n.attribute, n.brand)
   curr.n.response <- matrix(0, n.attribute, n.brand)
+  response.1 <-
+    example.raw.data[paste0(curr.id, "r", r.values[1], "c", c.values[1])]
+  n.respondent <- nrow(response.1)
+  
+  response.n.brand <- response.1
+  for (ix in 2:n.brand) {
+    response.n.brand <- rbind(response.n.brand, response.1)
+  }
+  raw.data <- response.n.brand
+  for (ix in 2:n.attribute) {
+    raw.data <- cbind(raw.data, response.n.brand)
+  }
   
   for (rx in 1:n.attribute) {
     prefix <- paste(curr.id, "r", r.values[rx], sep = "")
+    ix.hi <- 0
     for (cx in 1:n.brand) {
+      ix.lo <- ix.hi + 1
+      ix.hi <- ix.hi + n.respondent
+      
       curr.variable <- paste(prefix, "c", c.values[cx], sep = "")
       curr.map.index <-
         grep(curr.variable, example.data.map.variables$label)
-      curr.map.entry <- example.data.map.variables[curr.map.index,]
+      curr.map.entry <- example.data.map.variables[curr.map.index, ]
       curr.response <- example.raw.data[curr.variable]
+      raw.data[ix.lo:ix.hi, rx] <- curr.response
       curr.n.valid[rx, cx] <-
         sum(!is.na(curr.response), na.rm = TRUE)
       curr.n.response[rx, cx] <-
@@ -2371,8 +2658,13 @@ Q15 <- function (curr.id, question.order, aided.order) {
     }
   }
   
+  respondent.data <- raw.data
+  for (rx in 1:n.attribute) {
+    respondent.data[, rx] <- as.numeric(raw.data[, rx])
+  }
+  
   brand.name.vector <- as.vector(brand.name)
-  curr.brand.sample.size <- as.data.frame(curr.n.valid[1, ])
+  curr.brand.sample.size <- as.data.frame(curr.n.valid[1,])
   colnames(curr.brand.sample.size) <- "Sample Size"
   rownames(curr.brand.sample.size) <- brand.name.vector
   
@@ -2383,15 +2675,15 @@ Q15 <- function (curr.id, question.order, aided.order) {
   
   sort.n.valid <- curr.n.valid[question.order, aided.order]
   sorted.n.response <- curr.n.response[question.order, aided.order]
-  sorted.pct.response.1 <- curr.pct.response[question.order, ]
+  sorted.pct.response.1 <- curr.pct.response[question.order,]
   sorted.pct.response <- sorted.pct.response.1[, aided.order]
-  sorted.brand.sample.size <- curr.brand.sample.size[aided.order, ]
+  sorted.brand.sample.size <- curr.brand.sample.size[aided.order,]
   
   # significance testing of each brand vs each other brand for each question
   # Pearson's Chi-Square
   
   significance <- sorted.pct.response
-  significance[,] <- "" # clear the contents of significance
+  significance[, ] <- "" # clear the contents of significance
   
   letters <- rawToChar(as.raw(65:(64 + n.brand)))
   
@@ -2461,10 +2753,14 @@ Q15 <- function (curr.id, question.order, aided.order) {
       "#92b64e",
       "#71952c"
     ),
-    'keyOrder' = rowNames
+    'keyOrder' = rowNames,
+    "variable.code" = attribute,
+    "n.respondent" = n.respondent,
+    "respondent.data" = respondent.data,
+    "respondent.brand.list" = brand.name,
+    "respondent.attribute.list" = attribute
   )
 }
-
 
 #############  BEGIN SLIDE 8 q5  ##############
 
@@ -2646,26 +2942,73 @@ rollup.desc.Q12 <- c("Like a Lot",
 
 #source("Slides15 16 Q15 Brand Performance 20200628.R")
 
-Brand.Perceptual.Map <- function (q15.summary) {
-  q15.map <-
-    ca(q15.summary$just.pct.response)	# Run correspondence analysis
-  
-  attribute.coordinates <- q15.map$rowcoord
-  brand.coordinates <- q15.map$colcoord
-  scatterplot.data <-
-    rbind(attribute.coordinates[, 1:2],
-          brand.coordinates[, 1:2])
-  
-  colnames(scatterplot.data) <- c("x", "y")
-  result <- list(
-    "pct.response" = scatterplot.data,
-    "title" = "Brand Perceptual Map",
-    "curr.id" = q15.summary$curr.id,
-    "chart.type" = "scatterplot",
-    "n.valid" = q15.summary$n.valid
-  )
-  
-}
+Brand.Perceptual.Map <-
+  function (q15.summary,
+            attribute.statement,
+            n.report = 15) {
+    # q15.summary
+    #   $n.valid - note:  different sample size (number of valid responses) for each brand
+    #   $curr.id - string ("Q15")
+    #   $just.pct.response - data.frame (# of attributes x # of main brands)
+    
+    q15.attribute.statement <-
+      rownames(q15.summary$just.pct.response)
+    
+    q15.map <-
+      ca(q15.summary$just.pct.response)	# Run correspondence analysis
+    
+    attribute.coordinates <- q15.map$rowcoord
+    attribute.inertia <- q15.map$rowinertia
+    brand.coordinates <- q15.map$colcoord
+    
+    # select highest n.report values of inertia
+    
+    inertia.order <- order(attribute.inertia, decreasing = TRUE)
+    ix.report <- which(inertia.order <= n.report)
+    q15.attribute.report <- q15.attribute.statement[ix.report]
+    
+    q15.brief.report <-
+      q15.attribute.report # default to the full statement
+    ix.match <- match(q15.brief.report, attribute.statement$full)
+    jx.found <- which(!is.na(ix.match))
+    q15.brief.report[jx.found] <-
+      attribute.statement$brief[ix.match[jx.found]]
+    
+    scatterplot.attribute.data <-
+      attribute.coordinates[ix.report, 1:2]
+    rownames(scatterplot.attribute.data) <- q15.brief.report
+    
+    scatterplot.brand.data <- brand.coordinates[, 1:2]
+    
+    scatterplot.data <-
+      rbind(scatterplot.attribute.data, scatterplot.brand.data)
+    
+    colnames(scatterplot.data) <- c("x", "y")
+
+
+    
+    attributeIndexes <- c(1:nrow(scatterplot.data))
+    rowNames <- rownames(scatterplot.data)
+
+    data <- data.frame(attribute=attributeIndexes,scatterplot.data, userInputs=rowNames)
+
+    result <- list(
+      "pct.response" = scatterplot.data,
+      "title" = "Brand Perceptual Map",
+      "curr.id" = q15.summary$curr.id,
+      "chart.type" = "scatterplot",
+      "n.valid" = q15.summary$n.valid,
+      # different sample size (number of valid responses) for each brand
+      'questionID'='Q15',
+      "keyOrder" = rowNames,
+      "hasUserInputs" = TRUE, ### new key needed for scatter plots
+      "subTitle" = "For each statement shown below, please select only those brands you believe that statement describes.",
+      "chartType" = "scatteredPlot",
+      "data" = data,
+      'colors'= c('#98ca3c')
+    )
+    
+  }
 
 
 
@@ -4063,9 +4406,10 @@ out.slide7.Q3.subcatpurchfreq.HB <-
 out.slide7a.Q4.subcatconsfreq.HB <-
   Slide7a.Q4(curr.id = "Q4", n.level = 10)
 
+q6.prep <- Q6.Prep("Q6", n.level = 3)
+
 out.slide9.Q6.importance.VSB <-
-  Q6(curr.id = "Q6",
-     n.level = 3,
+  Q6(q6.prep,
      report.level = 2:3)
 
 out.slide10.c2.Q8.aidaware.VB <-
@@ -4157,7 +4501,8 @@ out.slide14.c2.q13.brandreclikelihood.HSB <-
   )
 
 out.slide19.q15.pmap.SP <-
-  Brand.Perceptual.Map(out.slide1516.Q15.brandperf.UK)
+  Brand.Perceptual.Map(q15.summary = out.slide1516.Q15.brandperf.UK,
+                       attribute.statement = q6.prep$attribute.statement)
 
 out.slide22.Q21.22.lastpurchphys <-
   Purchase.Prep("physical", respondent.location.prep, last.purchase.data)
@@ -4231,6 +4576,21 @@ out.slide24.r2c4.Q35.reasons.HB <-
 
 out.slide25.Q34.reasonchoosebrand.HB <-
   Q34.new(curr.id = "Q34")
+
+
+
+
+out.slide20.Q6.12.15.category.drivers.scatter <-
+  Category.Drivers(
+    out.slide1516.Q15.brandperf.UK,
+    out.slide14.c1.q12.brandaffinity.HSB,
+    out.slide9.Q6.importance.VSB
+  )
+
+out.slide26.smd.segment.membership <-
+  Segment.Membership("smd",
+                     respondent.segment.configuration)
+
 
 
 ###JSON FORMATTING EXAMPLE START ###
@@ -4544,9 +4904,10 @@ processedData <- list(
   "categoryBrandTopFeatures" = brandTopFeaturesFormatted,
   # slide 17, 18 out.slide1516.Q15.brandperf.UK         #  "category.brand.performance" = formatted.slide1516.Q15.brandperf,
   
-  "brandPerceptualMap" = out.slide19.q15.pmap.SP,
+  "brandPerceptualMap" =appendScatterPlotMetaData(returnChartDataAndMetaData(out.slide19.q15.pmap.SP)),
   # slide 19 don't know which row maps to which attribute or brand?
   
+  "categoryDriversAnalysis" = out.slide20.Q6.12.15.category.drivers.scatter ,
   ##### categoryDriversAnalysis Slide 20 is missing ###########
   #  "pmap" = formatted.slide19.q15.pmap,
   
@@ -4592,7 +4953,9 @@ processedData <- list(
   #out.slide24.r2c4.Q35.reasons.HB slide 24
   "reason1" =  reason1Formatted,
   #slide 25
-  "reason2" =  reason2Formatted
+  "reason2" =  reason2Formatted,
+
+  "smd" = out.slide26.smd.segment.membership
 )
 
 # for (x in 1:length(purchaseFrequencySubCategory)) {
@@ -4640,7 +5003,7 @@ if (debug) {
     toJSON(processedData, pretty = TRUE, auto_unbox = TRUE)
   lapply(processedDataJSON,
          write,
-         "./RscriptTests/crauProcessedData3.json")
+         "./RscriptTests/crauProcessedData4.json")
 } else {
   ## NOTE we need this in this format as for our reporting framework the last R script output needs to be that processedDataJSON
   processedDataJSON <-
