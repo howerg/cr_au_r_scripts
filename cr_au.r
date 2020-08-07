@@ -146,6 +146,7 @@ appendScatterPlotMetaData <- function(obj, quadrants=NULL){
   obj[['metadata']][['yAxis']] = yAxis
   obj[['hasUserInputs']] = TRUE
   obj[['quadrants']] = if(is.null(quadrants)) quadrantsDefault else quadrants
+  obj[['metadata']][['orientation']] = NULL
 
   result <- obj
 
@@ -328,6 +329,7 @@ Q6.Prep <- function(curr.id, n.level) {
     "level.label" = data.map.variable$values[1][[1]]$title
   )
 }
+
 
 Correlation <- function(x, y) {
   # exclude if either response is NA
