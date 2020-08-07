@@ -287,6 +287,7 @@ Attribute.Statement <- function(full.statement) {
 }
 
 
+
 Q6.Prep <- function(curr.id, n.level) {
   curr.pattern <- paste(curr.id, "r.+", sep = "")
   
@@ -413,7 +414,7 @@ Category.Drivers <-
       brand.performance$respondent.attribute.list
     
     ix.original <-
-      match(rownames(importance$data),
+      match(importance$full.attribute.statement.top.2.order,
             brand.performance$respondent.attribute.list)
     importance.affinity.correlation[, 2] <-
       importance$data[ix.original, 3]
@@ -2336,7 +2337,8 @@ Q6 <- function(q6.prep, report.level) {
       "#71952c"
     ),
     'keyOrder' = rowNames,
-    "respondent.data" = q6.prep$curr.data
+    "respondent.data" = q6.prep$curr.data,
+    "full.attribute.statement.top.2.order" = q6.prep$attribute.statement$full[top.2.order]
   )
 }
 
