@@ -146,7 +146,7 @@ appendScatterPlotMetaData <- function(obj, quadrants=NULL){
   obj[['metadata']][['yAxis']] = yAxis
   obj[['hasUserInputs']] = TRUE
   obj[['quadrants']] = if(is.null(quadrants)) quadrantsDefault else quadrants
-  obj[['metadata']][['orientation']] = NULL
+  obj[['metadata']][['orientation']] <- NULL
 
   result <- obj
 
